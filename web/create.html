@@ -295,7 +295,10 @@
             document.getElementById('generate-abilities').addEventListener('click', generateAbilities);
 
             // Form submission
-            document.getElementById('character-form').addEventListener('submit', handleFormSubmit);
+            const form = document.getElementById('character-form');
+            if (form) {
+                form.addEventListener('submit', handleFormSubmit);
+            }
         }
 
         function generateAbilities() {
