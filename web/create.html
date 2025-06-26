@@ -183,7 +183,7 @@
                             <button type="button" class="btn btn-secondary me-3" onclick="window.location.href='index.html'">
                                 ❌ Cancel
                             </button>
-                            <button type="submit" class="btn btn-primary btn-lg">
+                            <button type="submit" class="btn btn-primary btn-lg" id="save-button">
                                 💾 Save Character
                             </button>
                         </div>
@@ -452,6 +452,13 @@
         function handleFormSubmit(event) {
             event.preventDefault();
 
+            const saveButton = document.getElementById('save-button');
+            const originalButtonText = saveButton.innerHTML;
+            
+            // Disable button and show loading state
+            saveButton.disabled = true;
+            saveButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>💾 Saving...';
+
             const formData = new FormData(event.target);
             const characterData = {
                 name: formData.get('name'),
@@ -475,25 +482,39 @@
             // Validate form
             const validation = validateCharacterForm(characterData);
             if (!validation.valid) {
+                // Re-enable button on validation error
+                saveButton.disabled = false;
+                saveButton.innerHTML = originalButtonText;
                 showAlert('Please fix the following errors:<br>' + validation.errors.join('<br>'), 'danger');
                 return;
             }
 
-            try {
-                // Create and save character
-                const character = createCharacter(characterData);
-                const id = saveCharacter(character);
-                
-                showAlert(`Character "${character.name}" created successfully!`, 'success');
-                
-                // Redirect to character view or list
-                setTimeout(() => {
-                    window.location.href = 'characters.html';
-                }, 2000);
-                
-            } catch (error) {
-                showAlert('Failed to save character: ' + error.message, 'danger');
-            }
+            // Simulate a brief delay to show the loading state (since localStorage is instant)
+            setTimeout(() => {
+                try {
+                    // Create and save character
+                    const character = createCharacter(characterData);
+                    const id = saveCharacter(character);
+                    
+                    // Update button to show success
+                    saveButton.innerHTML = '✅ Character Saved!';
+                    saveButton.classList.remove('btn-primary');
+                    saveButton.classList.add('btn-success');
+                    
+                    showAlert(`Character "${character.name}" created successfully!`, 'success');
+                    
+                    // Redirect to character view or list
+                    setTimeout(() => {
+                        window.location.href = 'characters.html';
+                    }, 2000);
+                    
+                } catch (error) {
+                    // Re-enable button on error
+                    saveButton.disabled = false;
+                    saveButton.innerHTML = originalButtonText;
+                    showAlert('Failed to save character: ' + error.message, 'danger');
+                }
+            }, 500); // Brief delay to show loading state
         }
     </script>
 </body>
