@@ -27,7 +27,7 @@ func (h *WebHandler) CharacterListHandler(w http.ResponseWriter, r *http.Request
 		Characters: characters,
 	}
 
-	if err := h.templates.ExecuteTemplate(w, "list.html", data); err != nil {
+	if err := h.templates.ExecuteTemplate(w, "list_standalone.html", data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -62,7 +62,7 @@ func (h *WebHandler) CharacterViewHandler(w http.ResponseWriter, r *http.Request
 		Character: savedChar,
 	}
 
-	if err := h.templates.ExecuteTemplate(w, "view.html", data); err != nil {
+	if err := h.templates.ExecuteTemplate(w, "view_standalone.html", data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
