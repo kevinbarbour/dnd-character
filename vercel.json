@@ -1,41 +1,32 @@
 {
-  "functions": {
-    "api/**/*.go": {
-      "runtime": "go1.x"
-    }
-  },
   "rewrites": [
     {
       "source": "/static/(.*)",
       "destination": "/public/static/$1"
     },
     {
-      "source": "/characters/new",
-      "destination": "/api/characters/new"
+      "source": "/api/data",
+      "destination": "/api/data"
     },
     {
-      "source": "/characters/([0-9]+)/delete",
-      "destination": "/api/characters/delete?id=$1"
+      "source": "/api/characters/list",
+      "destination": "/api/characters/list"
     },
     {
-      "source": "/characters/([0-9]+)",
-      "destination": "/api/characters/view?id=$1"
-    },
-    {
-      "source": "/characters",
-      "destination": "/api/characters"
+      "source": "/api/characters/create",
+      "destination": "/api/characters/create"
     },
     {
       "source": "/api/generate-abilities",
       "destination": "/api/generate-abilities"
     },
     {
-      "source": "/api/spells/(.*)",
-      "destination": "/api/spells?class=$1"
+      "source": "/api/spells",
+      "destination": "/api/spells"
     },
     {
       "source": "/",
-      "destination": "/api/index"
+      "destination": "/public/index.html"
     }
   ]
 }

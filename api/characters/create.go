@@ -3,14 +3,12 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"net/http"
-	"path/filepath"
 	"strconv"
 	"strings"
 
-	"github.com/kevinbarbour/dungeon-and-dragon/internal/character"
-	"github.com/kevinbarbour/dungeon-and-dragon/internal/database"
+	"github.com/kevinbarbour/dungeon-and-dragon/pkg/character"
+	"github.com/kevinbarbour/dungeon-and-dragon/pkg/database"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
@@ -22,20 +20,13 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	defer database.CloseDB()
 
 	if r.Method == "GET" {
-		// Show the creation form
-		tmplPath := filepath.Join("public", "templates", "create_standalone.html")
-		tmpl, err := template.ParseFiles(tmplPath)
-		if err != nil {
-			http.Error(w, "Template loading failed: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-
+		// Return form data for character creation
 		data := struct {
-			Title       string
-			Races       []character.Race
-			Classes     []character.Class
-			Backgrounds []character.Background
-			Methods     []character.AbilityGenerationMethod
+			Title       string                              `json:"title"`
+			Races       []character.Race                    `json:"races"`
+			Classes     []character.Class                   `json:"classes"`
+			Backgrounds []character.Background              `json:"backgrounds"`
+			Methods     []character.AbilityGenerationMethod `json:"methods"`
 		}{
 			Title:       "Create New Character",
 			Races:       character.GetAllRaces(),
@@ -44,9 +35,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 			Methods:     character.GetAllMethods(),
 		}
 
-		w.Header().Set("Content-Type", "text/html")
-		if err := tmpl.Execute(w, data); err != nil {
-			http.Error(w, "Template execution failed: "+err.Error(), http.StatusInternalServerError)
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(data); err != nil {
+			http.Error(w, "JSON encoding failed: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 		return
@@ -73,8 +64,22 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Redirect to the new character's page
-		http.Redirect(w, r, fmt.Sprintf("/characters/%d", id), http.StatusSeeOther)
+		// Return success response with character ID
+		response := struct {
+			Success     bool   `json:"success"`
+			CharacterID int    `json:"characterId"`
+			Message     string `json:"message"`
+		}{
+			Success:     true,
+			CharacterID: id,
+			Message:     "Character created successfully",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			http.Error(w, "JSON encoding failed: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
 		return
 	}
 

@@ -1,0 +1,439 @@
+/* D&D Character Creator Styles */
+
+:root {
+    --primary-color: #8B4513;
+    --secondary-color: #DAA520;
+    --accent-color: #DC143C;
+    --dark-color: #2F1B14;
+    --light-color: #F5F5DC;
+    --success-color: #228B22;
+    --warning-color: #FF8C00;
+    --info-color: #4682B4;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+}
+
+/* Navigation */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 3rem 2rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    margin-bottom: 2rem;
+}
+
+.hero-section .display-4 {
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Feature Cards */
+.feature-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.stats .badge {
+    margin: 0.2rem;
+    font-size: 0.8rem;
+}
+
+/* Spell Class Cards */
+.spell-class-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s ease;
+}
+
+.spell-class-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+.class-icon {
+    font-size: 2rem;
+    margin-right: 1rem;
+}
+
+.class-info strong {
+    display: block;
+    color: var(--primary-color);
+}
+
+.class-info small {
+    color: #666;
+}
+
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border: none;
+    border-radius: 25px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.btn-outline-secondary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    border-radius: 25px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Character Creation Form */
+.character-form {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.form-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.form-section h4 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+/* Ability Scores */
+.ability-scores {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.ability-score {
+    text-align: center;
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.ability-score label {
+    font-weight: bold;
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.ability-score input {
+    width: 60px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: 2px solid var(--secondary-color);
+    border-radius: 5px;
+}
+
+.ability-modifier {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+/* Spell Selection */
+.spell-selection {
+    margin-top: 2rem;
+}
+
+.spell-category {
+    margin-bottom: 2rem;
+}
+
+.spell-category h5 {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--secondary-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.spell-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.spell-card {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.spell-card:hover {
+    border-color: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.spell-card.selected {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, var(--light-color) 0%, #fff 100%);
+}
+
+.spell-card.selected::after {
+    content: "✓";
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: var(--success-color);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.spell-name {
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.spell-school {
+    font-size: 0.8rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.spell-description {
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: 0.5rem;
+}
+
+/* Character List */
+.character-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.character-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.character-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.character-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.character-class-race {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.character-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.stat-item {
+    text-align: center;
+    background: #f8f9fa;
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+.stat-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #666;
+    text-transform: uppercase;
+}
+
+/* Character Actions */
+.character-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.character-actions .btn {
+    border-radius: 20px;
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+}
+
+/* Quick Actions */
+.quick-actions {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 2rem 1rem;
+    }
+    
+    .ability-scores {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .spell-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .character-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .character-actions {
+        margin-top: 1rem;
+        width: 100%;
+    }
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Tooltips */
+.tooltip-inner {
+    background-color: var(--dark-color);
+    color: white;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+/* Success/Error Messages */
+.alert-custom {
+    border-radius: 10px;
+    border: none;
+    padding: 1rem 1.5rem;
+    margin: 1rem 0;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, var(--success-color) 0%, #32CD32 100%);
+    color: white;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, var(--accent-color) 0%, #FF6347 100%);
+    color: white;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+}
+
+footer a {
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: var(--secondary-color) !important;
+}
+
+/* Print Styles */
+@media print {
+    .navbar, footer, .quick-actions, .character-actions {
+        display: none !important;
+    }
+    
+    .character-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+}

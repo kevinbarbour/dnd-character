@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&D 5e Character Creator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/custom.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">🎲 D&D Character Creator</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/characters.html">My Characters</a>
+                <a class="nav-link" href="/create.html">Create Character</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="hero-section text-center mb-5">
+                    <h1 class="display-4 mb-3">🗡️ D&D 5e Character Creator ✨</h1>
+                    <p class="lead">Create amazing Dungeons & Dragons characters with full spell selection!</p>
+                    <div class="mt-4">
+                        <a href="/create.html" class="btn btn-primary btn-lg me-3">Create New Character</a>
+                        <a href="/characters.html" class="btn btn-outline-secondary btn-lg">View Characters</a>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-5">
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">🏰 Complete D&D 5e</h5>
+                                <p class="card-text">All official races, classes, and backgrounds from the Player's Handbook.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">✨ Spell Selection</h5>
+                                <p class="card-text">Interactive spell selection for all 6 spellcasting classes with authentic D&D spells.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">💾 Character Management</h5>
+                                <p class="card-text">Save, view, and manage your character collection with persistent storage.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">📊 Available Options</h5>
+                            <div class="row text-center" id="stats">
+                                <div class="col-md-3">
+                                    <div class="stat-item">
+                                        <h3 class="text-primary" id="race-count">-</h3>
+                                        <p>Races</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-item">
+                                        <h3 class="text-success" id="class-count">-</h3>
+                                        <p>Classes</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-item">
+                                        <h3 class="text-warning" id="background-count">-</h3>
+                                        <p>Backgrounds</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-item">
+                                        <h3 class="text-info" id="character-count">-</h3>
+                                        <p>Your Characters</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="spellcaster-info mt-5">
+                    <h3>🔮 Spellcasting Classes</h3>
+                    <div class="row g-3">
+                        <div class="col-md-6 col-lg-4">
+                            <div class="spell-class-card">
+                                <strong>🧙‍♂️ Wizard</strong> - 3 cantrips, 2 spells
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="spell-class-card">
+                                <strong>⛪ Cleric</strong> - 3 cantrips, 2 spells
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="spell-class-card">
+                                <strong>🎵 Bard</strong> - 2 cantrips, 4 spells
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="spell-class-card">
+                                <strong>🔥 Sorcerer</strong> - 4 cantrips, 2 spells
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="spell-class-card">
+                                <strong>👹 Warlock</strong> - 2 cantrips, 2 spells
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="spell-class-card">
+                                <strong>🌿 Druid</strong> - 2 cantrips, 2 spells
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-light mt-5 py-4">
+        <div class="container text-center">
+            <p>&copy; 2024 D&D Character Creator. Built with ❤️ for adventurers everywhere!</p>
+            <p><small>Dungeons & Dragons content is owned by Wizards of the Coast.</small></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        // Load home page data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadHomeData();
+        });
+
+        async function loadHomeData() {
+            try {
+                const response = await fetch('/api/data');
+                const data = await response.json();
+                
+                document.getElementById('race-count').textContent = data.races.length;
+                document.getElementById('class-count').textContent = data.classes.length;
+                document.getElementById('background-count').textContent = data.backgrounds.length;
+                document.getElementById('character-count').textContent = data.characterCount;
+            } catch (error) {
+                console.error('Error loading home data:', error);
+            }
+        }
+    </script>
+</body>
+</html>

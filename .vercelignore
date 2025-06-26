@@ -1,0 +1,6 @@
+main.go
+web/
+internal/ui/
+*.db
+test-build
+dnd-character-creator
