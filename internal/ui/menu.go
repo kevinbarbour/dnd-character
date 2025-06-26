@@ -2,8 +2,10 @@ package ui
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/kevinbarbour/dungeon-and-dragon/internal/character"
+	"github.com/kevinbarbour/dungeon-and-dragon/internal/database"
 	"github.com/manifoldco/promptui"
 )
 
@@ -206,4 +208,220 @@ func AskToContinue(message string) error {
 	}
 	_, err := prompt.Run()
 	return err
+}
+
+// MainMenuOption represents a main menu option
+type MainMenuOption string
+
+const (
+	CreateNewCharacter    MainMenuOption = "Create New Character"
+	ManageSavedCharacters MainMenuOption = "Manage Saved Characters"
+	Exit                  MainMenuOption = "Exit"
+)
+
+// ShowMainMenu displays the main menu and returns the selected option
+func ShowMainMenu() (MainMenuOption, error) {
+	options := []MainMenuOption{
+		CreateNewCharacter,
+		ManageSavedCharacters,
+		Exit,
+	}
+
+	templates := &promptui.SelectTemplates{
+		Label:    "{{ . }}?",
+		Active:   "▶ {{ . | cyan }}",
+		Inactive: "  {{ . | white }}",
+		Selected: "▶ {{ . | red | cyan }}",
+	}
+
+	prompt := promptui.Select{
+		Label:     "What would you like to do",
+		Items:     options,
+		Templates: templates,
+		Size:      len(options),
+		HideHelp:  true,
+	}
+
+	index, _, err := prompt.Run()
+	if err != nil {
+		return "", err
+	}
+
+	return options[index], nil
+}
+
+// CharacterManagementOption represents character management options
+type CharacterManagementOption string
+
+const (
+	ListCharacters  CharacterManagementOption = "List All Characters"
+	ViewCharacter   CharacterManagementOption = "View Character Details"
+	EditCharacter   CharacterManagementOption = "Edit Character"
+	DeleteCharacter CharacterManagementOption = "Delete Character"
+	BackToMainMenu  CharacterManagementOption = "Back to Main Menu"
+)
+
+// ShowCharacterManagementMenu displays the character management menu
+func ShowCharacterManagementMenu() (CharacterManagementOption, error) {
+	options := []CharacterManagementOption{
+		ListCharacters,
+		ViewCharacter,
+		EditCharacter,
+		DeleteCharacter,
+		BackToMainMenu,
+	}
+
+	templates := &promptui.SelectTemplates{
+		Label:    "{{ . }}?",
+		Active:   "📋 {{ . | cyan }}",
+		Inactive: "  {{ . | white }}",
+		Selected: "📋 {{ . | red | cyan }}",
+	}
+
+	prompt := promptui.Select{
+		Label:     "Character Management",
+		Items:     options,
+		Templates: templates,
+		Size:      len(options),
+		HideHelp:  true,
+	}
+
+	index, _, err := prompt.Run()
+	if err != nil {
+		return "", err
+	}
+
+	return options[index], nil
+}
+
+// SelectSavedCharacter allows the user to select from saved characters
+func SelectSavedCharacter(characters []database.SavedCharacter, action string) (*database.SavedCharacter, error) {
+	if len(characters) == 0 {
+		fmt.Println("\n📭 No saved characters found.")
+		return nil, fmt.Errorf("no characters available")
+	}
+
+	// Create display items with character info
+	displayItems := make([]string, len(characters))
+	for i, char := range characters {
+		displayItems[i] = fmt.Sprintf("%s (Level %d %s %s) - Created: %s",
+			char.Character.Name,
+			char.Character.Level,
+			char.Character.Race.Name,
+			char.Character.Class.Name,
+			char.CreatedAt.Format("2006-01-02"),
+		)
+	}
+
+	templates := &promptui.SelectTemplates{
+		Label:    "{{ . }}?",
+		Active:   "🧙 {{ . | cyan }}",
+		Inactive: "  {{ . | white }}",
+		Selected: "🧙 {{ . | red | cyan }}",
+	}
+
+	prompt := promptui.Select{
+		Label:     fmt.Sprintf("Select a character to %s", action),
+		Items:     displayItems,
+		Templates: templates,
+		Size:      10,
+		HideHelp:  true,
+	}
+
+	index, _, err := prompt.Run()
+	if err != nil {
+		return nil, err
+	}
+
+	return &characters[index], nil
+}
+
+// ConfirmSaveCharacter asks if the user wants to save the character
+func ConfirmSaveCharacter() (bool, error) {
+	prompt := promptui.Prompt{
+		Label:     "Save this character to database? (Y/n)",
+		Default:   "Y",
+		AllowEdit: true,
+	}
+
+	result, err := prompt.Run()
+	if err != nil {
+		return false, err
+	}
+
+	return result == "Y" || result == "y" || result == "yes" || result == "Yes" || result == "", nil
+}
+
+// ConfirmDelete asks for confirmation before deleting a character
+func ConfirmDelete(characterName string) (bool, error) {
+	prompt := promptui.Prompt{
+		Label:     fmt.Sprintf("Are you sure you want to delete '%s'? This cannot be undone (y/N)", characterName),
+		Default:   "N",
+		AllowEdit: true,
+	}
+
+	result, err := prompt.Run()
+	if err != nil {
+		return false, err
+	}
+
+	return result == "y" || result == "Y" || result == "yes" || result == "Yes", nil
+}
+
+// ShowCharacterList displays a formatted list of all characters
+func ShowCharacterList(characters []database.SavedCharacter) {
+	if len(characters) == 0 {
+		fmt.Println("\n📭 No saved characters found.")
+		return
+	}
+
+	fmt.Printf("\n📚 Saved Characters (%d total):\n", len(characters))
+	fmt.Println("═══════════════════════════════════════════════════════════════")
+
+	for _, char := range characters {
+		fmt.Printf("🧙 %s (ID: %d)\n", char.Character.Name, char.ID)
+		fmt.Printf("   Level %d %s %s\n", char.Character.Level, char.Character.Race.Name, char.Character.Class.Name)
+		fmt.Printf("   Background: %s\n", char.Character.Background.Name)
+		fmt.Printf("   Created: %s\n", char.CreatedAt.Format("2006-01-02 15:04"))
+		if !char.UpdatedAt.Equal(char.CreatedAt) {
+			fmt.Printf("   Updated: %s\n", char.UpdatedAt.Format("2006-01-02 15:04"))
+		}
+		fmt.Println("───────────────────────────────────────────────────────────────")
+	}
+}
+
+// ShowCharacterDetails displays detailed information about a character
+func ShowCharacterDetails(saved *database.SavedCharacter) {
+	fmt.Printf("\n📋 Character Details (ID: %d)\n", saved.ID)
+	fmt.Println("═══════════════════════════════════════════════════════════════")
+	fmt.Println(saved.Character.String())
+	fmt.Printf("Created: %s\n", saved.CreatedAt.Format("2006-01-02 15:04:05"))
+	if !saved.UpdatedAt.Equal(saved.CreatedAt) {
+		fmt.Printf("Updated: %s\n", saved.UpdatedAt.Format("2006-01-02 15:04:05"))
+	}
+}
+
+// GetCharacterID prompts for a character ID
+func GetCharacterID() (int, error) {
+	validate := func(input string) error {
+		if len(input) < 1 {
+			return fmt.Errorf("character ID cannot be empty")
+		}
+		if _, err := strconv.Atoi(input); err != nil {
+			return fmt.Errorf("character ID must be a number")
+		}
+		return nil
+	}
+
+	prompt := promptui.Prompt{
+		Label:    "Enter character ID",
+		Validate: validate,
+	}
+
+	result, err := prompt.Run()
+	if err != nil {
+		return 0, err
+	}
+
+	return strconv.Atoi(result)
 }

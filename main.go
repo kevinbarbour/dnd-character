@@ -6,25 +6,44 @@ import (
 	"os"
 
 	"github.com/kevinbarbour/dungeon-and-dragon/internal/character"
+	"github.com/kevinbarbour/dungeon-and-dragon/internal/database"
 	"github.com/kevinbarbour/dungeon-and-dragon/internal/ui"
 )
 
 func main() {
+	// Initialize database
+	if err := database.InitDB(); err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
+	defer database.CloseDB()
+
 	// Show welcome message
 	ui.ShowWelcome()
 
-	// Create a new character
-	char, err := createCharacter()
-	if err != nil {
-		log.Fatalf("Error creating character: %v", err)
+	// Main application loop
+	for {
+		option, err := ui.ShowMainMenu()
+		if err != nil {
+			log.Fatalf("Error showing main menu: %v", err)
+		}
+
+		switch option {
+		case ui.CreateNewCharacter:
+			if err := handleCreateCharacter(); err != nil {
+				fmt.Printf("Error creating character: %v\n", err)
+				ui.AskToContinue("Press Enter to continue")
+			}
+		case ui.ManageSavedCharacters:
+			if err := handleCharacterManagement(); err != nil {
+				fmt.Printf("Error in character management: %v\n", err)
+				ui.AskToContinue("Press Enter to continue")
+			}
+		case ui.Exit:
+			fmt.Println("\nThank you for using the D&D 5e Character Creator!")
+			fmt.Println("May your adventures be legendary! 🗡️✨")
+			return
+		}
 	}
-
-	// Show final character sheet
-	fmt.Println("\n🎉 Character created successfully!")
-	fmt.Println(char.String())
-
-	fmt.Println("\nThank you for using the D&D 5e Character Creator!")
-	fmt.Println("May your adventures be legendary! 🗡️✨")
 }
 
 func createCharacter() (character.Character, error) {
@@ -98,4 +117,199 @@ func createCharacter() (character.Character, error) {
 	}
 
 	return char, nil
+}
+
+// handleCreateCharacter handles the character creation flow
+func handleCreateCharacter() error {
+	char, err := createCharacter()
+	if err != nil {
+		return err
+	}
+
+	// Ask if user wants to save the character
+	save, err := ui.ConfirmSaveCharacter()
+	if err != nil {
+		return fmt.Errorf("failed to confirm save: %w", err)
+	}
+
+	if save {
+		id, err := database.SaveCharacter(char)
+		if err != nil {
+			return fmt.Errorf("failed to save character: %w", err)
+		}
+		fmt.Printf("\n💾 Character saved successfully with ID: %d\n", id)
+	}
+
+	// Show final character sheet
+	fmt.Println("\n🎉 Character created successfully!")
+	fmt.Println(char.String())
+
+	return ui.AskToContinue("Press Enter to continue")
+}
+
+// handleCharacterManagement handles the character management menu
+func handleCharacterManagement() error {
+	for {
+		option, err := ui.ShowCharacterManagementMenu()
+		if err != nil {
+			return err
+		}
+
+		switch option {
+		case ui.ListCharacters:
+			if err := handleListCharacters(); err != nil {
+				fmt.Printf("Error listing characters: %v\n", err)
+				ui.AskToContinue("Press Enter to continue")
+			}
+		case ui.ViewCharacter:
+			if err := handleViewCharacter(); err != nil {
+				fmt.Printf("Error viewing character: %v\n", err)
+				ui.AskToContinue("Press Enter to continue")
+			}
+		case ui.EditCharacter:
+			if err := handleEditCharacter(); err != nil {
+				fmt.Printf("Error editing character: %v\n", err)
+				ui.AskToContinue("Press Enter to continue")
+			}
+		case ui.DeleteCharacter:
+			if err := handleDeleteCharacter(); err != nil {
+				fmt.Printf("Error deleting character: %v\n", err)
+				ui.AskToContinue("Press Enter to continue")
+			}
+		case ui.BackToMainMenu:
+			return nil
+		}
+	}
+}
+
+// handleListCharacters lists all saved characters
+func handleListCharacters() error {
+	characters, err := database.GetAllCharacters()
+	if err != nil {
+		return fmt.Errorf("failed to get characters: %w", err)
+	}
+
+	ui.ShowCharacterList(characters)
+	return ui.AskToContinue("Press Enter to continue")
+}
+
+// handleViewCharacter shows details of a specific character
+func handleViewCharacter() error {
+	characters, err := database.GetAllCharacters()
+	if err != nil {
+		return fmt.Errorf("failed to get characters: %w", err)
+	}
+
+	selected, err := ui.SelectSavedCharacter(characters, "view")
+	if err != nil {
+		return err
+	}
+
+	ui.ShowCharacterDetails(selected)
+	return ui.AskToContinue("Press Enter to continue")
+}
+
+// handleEditCharacter allows editing of a character
+func handleEditCharacter() error {
+	characters, err := database.GetAllCharacters()
+	if err != nil {
+		return fmt.Errorf("failed to get characters: %w", err)
+	}
+
+	selected, err := ui.SelectSavedCharacter(characters, "edit")
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("\n📝 Editing character: %s\n", selected.Character.Name)
+	fmt.Println("Note: This will create a new character with the same base stats.")
+	fmt.Println("You can modify the race, class, and background.")
+
+	// Create a copy of the character for editing
+	editChar := selected.Character
+
+	// Allow user to change race
+	fmt.Println("\n🔄 Select new race (current: " + editChar.Race.Name + ")")
+	newRace, err := ui.SelectRace()
+	if err != nil {
+		return fmt.Errorf("failed to select new race: %w", err)
+	}
+
+	// Reset abilities to base values (remove old racial bonuses)
+	baseAbilities := editChar.Abilities
+	baseAbilities.Strength -= editChar.Race.StrengthBonus
+	baseAbilities.Dexterity -= editChar.Race.DexterityBonus
+	baseAbilities.Constitution -= editChar.Race.ConstitutionBonus
+	baseAbilities.Intelligence -= editChar.Race.IntelligenceBonus
+	baseAbilities.Wisdom -= editChar.Race.WisdomBonus
+	baseAbilities.Charisma -= editChar.Race.CharismaBonus
+
+	// Apply new racial bonuses
+	editChar.Race = newRace
+	baseAbilities.ApplyRacialBonuses(newRace)
+	editChar.Abilities = baseAbilities
+
+	// Allow user to change class
+	fmt.Println("\n🔄 Select new class (current: " + editChar.Class.Name + ")")
+	newClass, err := ui.SelectClass()
+	if err != nil {
+		return fmt.Errorf("failed to select new class: %w", err)
+	}
+	editChar.Class = newClass
+
+	// Allow user to change background
+	fmt.Println("\n🔄 Select new background (current: " + editChar.Background.Name + ")")
+	newBackground, err := ui.SelectBackground()
+	if err != nil {
+		return fmt.Errorf("failed to select new background: %w", err)
+	}
+	editChar.Background = newBackground
+
+	// Confirm changes
+	confirmed, err := ui.ConfirmCharacter(editChar)
+	if err != nil {
+		return fmt.Errorf("failed to confirm changes: %w", err)
+	}
+
+	if confirmed {
+		err = database.UpdateCharacter(selected.ID, editChar)
+		if err != nil {
+			return fmt.Errorf("failed to update character: %w", err)
+		}
+		fmt.Printf("\n✅ Character '%s' updated successfully!\n", editChar.Name)
+	} else {
+		fmt.Println("\n❌ Character edit cancelled.")
+	}
+
+	return ui.AskToContinue("Press Enter to continue")
+}
+
+// handleDeleteCharacter deletes a character
+func handleDeleteCharacter() error {
+	characters, err := database.GetAllCharacters()
+	if err != nil {
+		return fmt.Errorf("failed to get characters: %w", err)
+	}
+
+	selected, err := ui.SelectSavedCharacter(characters, "delete")
+	if err != nil {
+		return err
+	}
+
+	confirmed, err := ui.ConfirmDelete(selected.Character.Name)
+	if err != nil {
+		return fmt.Errorf("failed to confirm deletion: %w", err)
+	}
+
+	if confirmed {
+		err = database.DeleteCharacter(selected.ID)
+		if err != nil {
+			return fmt.Errorf("failed to delete character: %w", err)
+		}
+		fmt.Printf("\n🗑️ Character '%s' deleted successfully.\n", selected.Character.Name)
+	} else {
+		fmt.Println("\n❌ Character deletion cancelled.")
+	}
+
+	return ui.AskToContinue("Press Enter to continue")
 }
