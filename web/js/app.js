@@ -306,6 +306,9 @@ function renderCharacterCard(character) {
                     <button class="btn btn-sm btn-primary" onclick="viewCharacter(${character.id})">
                         <i class="fas fa-eye"></i> View
                     </button>
+                    <button class="btn btn-sm btn-info" onclick="shareCharacter(${character.id})">
+                        <i class="fas fa-share"></i> Share
+                    </button>
                     <button class="btn btn-sm btn-secondary" onclick="exportCharacter(${character.id})">
                         <i class="fas fa-download"></i> Export
                     </button>
@@ -400,6 +403,123 @@ function deleteCharacterConfirm(id) {
     }
 }
 
+// URL sharing functions
+function encodeCharacterToURL(character) {
+    try {
+        // Create a simplified character object for URL sharing
+        const shareData = {
+            n: character.name,
+            r: character.race,
+            c: character.class,
+            b: character.background,
+            l: character.level || 1,
+            a: character.abilities,
+            s: character.spells || []
+        };
+        
+        // Convert to JSON and encode
+        const jsonString = JSON.stringify(shareData);
+        const encoded = btoa(jsonString);
+        
+        return encoded;
+    } catch (error) {
+        console.error('Failed to encode character:', error);
+        return null;
+    }
+}
+
+function decodeCharacterFromURL(encodedData) {
+    try {
+        // Decode and parse
+        const jsonString = atob(encodedData);
+        const shareData = JSON.parse(jsonString);
+        
+        // Convert back to full character object
+        const character = {
+            name: shareData.n,
+            race: shareData.r,
+            class: shareData.c,
+            background: shareData.b,
+            level: shareData.l || 1,
+            abilities: shareData.a,
+            spells: shareData.s || [],
+            hitPoints: calculateHitPoints(shareData.c, shareData.a.constitution),
+            armorClass: calculateArmorClass(shareData.a.dexterity),
+            proficiencyBonus: 2, // Level 1
+            equipment: getStartingEquipment(shareData.c, shareData.b),
+            skills: [],
+            savingThrows: getSavingThrowProficiencies(shareData.c),
+            created: new Date().toISOString(),
+            updated: new Date().toISOString(),
+            shared: true // Mark as shared character
+        };
+        
+        return character;
+    } catch (error) {
+        console.error('Failed to decode character:', error);
+        return null;
+    }
+}
+
+function generateShareURL(character) {
+    const encoded = encodeCharacterToURL(character);
+    if (!encoded) return null;
+    
+    const baseURL = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
+    return `${baseURL}character.html?share=${encoded}`;
+}
+
+function copyShareURL(character) {
+    const shareURL = generateShareURL(character);
+    if (!shareURL) {
+        showAlert('Failed to generate share URL', 'danger');
+        return;
+    }
+    
+    // Copy to clipboard
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(shareURL).then(() => {
+            showAlert('Share URL copied to clipboard!', 'success');
+        }).catch(() => {
+            // Fallback for older browsers
+            fallbackCopyToClipboard(shareURL);
+        });
+    } else {
+        fallbackCopyToClipboard(shareURL);
+    }
+}
+
+function fallbackCopyToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        showAlert('Share URL copied to clipboard!', 'success');
+    } catch (err) {
+        showAlert('Failed to copy URL. Please copy manually: ' + text, 'warning');
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+// Character sharing function
+function shareCharacter(id) {
+    const character = getCharacter(id);
+    if (!character) {
+        showAlert('Character not found', 'danger');
+        return;
+    }
+    
+    copyShareURL(character);
+}
+
 // Export global functions
 window.ABILITY_GENERATION_METHODS = ABILITY_GENERATION_METHODS;
 window.generateAbilityScores = generateAbilityScores;
@@ -415,3 +535,8 @@ window.getCharacterSummary = getCharacterSummary;
 window.renderCharacterCard = renderCharacterCard;
 window.viewCharacter = viewCharacter;
 window.deleteCharacterConfirm = deleteCharacterConfirm;
+window.shareCharacter = shareCharacter;
+window.encodeCharacterToURL = encodeCharacterToURL;
+window.decodeCharacterFromURL = decodeCharacterFromURL;
+window.generateShareURL = generateShareURL;
+window.copyShareURL = copyShareURL;

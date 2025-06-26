@@ -50,10 +50,16 @@
                             <p class="text-muted" id="character-background">Background</p>
                         </div>
                         <div class="btn-group">
+                            <button class="btn btn-outline-info" onclick="shareCurrentCharacter()" id="share-button">
+                                <i class="fas fa-share"></i> Share
+                            </button>
                             <button class="btn btn-outline-secondary" onclick="exportCurrentCharacter()">
                                 <i class="fas fa-download"></i> Export
                             </button>
-                            <button class="btn btn-outline-danger" onclick="deleteCurrentCharacter()">
+                            <button class="btn btn-outline-success" onclick="saveSharedCharacter()" id="save-shared-button" style="display: none;">
+                                <i class="fas fa-save"></i> Save to My Characters
+                            </button>
+                            <button class="btn btn-outline-danger" onclick="deleteCurrentCharacter()" id="delete-button">
                                 <i class="fas fa-trash"></i> Delete
                             </button>
                             <a href="characters.html" class="btn btn-primary">
@@ -236,10 +242,27 @@
         });
 
         function loadCharacter() {
-            // Get character ID from URL parameters
+            // Get parameters from URL
             const urlParams = new URLSearchParams(window.location.search);
             const characterId = urlParams.get('id');
+            const sharedData = urlParams.get('share');
 
+            // Check if this is a shared character
+            if (sharedData) {
+                currentCharacter = decodeCharacterFromURL(sharedData);
+                if (!currentCharacter) {
+                    showAlert('Invalid shared character data', 'danger');
+                    showCharacterNotFound();
+                    return;
+                }
+                
+                // Show shared character banner
+                showSharedCharacterBanner();
+                displayCharacter(currentCharacter);
+                return;
+            }
+
+            // Regular character loading
             if (!characterId) {
                 showCharacterNotFound();
                 return;
@@ -456,6 +479,74 @@
                 } catch (error) {
                     showAlert('Failed to delete character: ' + error.message, 'danger');
                 }
+            }
+        }
+
+        function shareCurrentCharacter() {
+            if (!currentCharacter) return;
+            
+            copyShareURL(currentCharacter);
+        }
+
+        function showSharedCharacterBanner() {
+            // Show banner indicating this is a shared character
+            const banner = document.createElement('div');
+            banner.className = 'alert alert-info alert-dismissible fade show';
+            banner.innerHTML = `
+                <i class="fas fa-share me-2"></i>
+                <strong>Shared Character:</strong> This character was shared with you! 
+                You can save it to your collection using the "Save to My Characters" button.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            const container = document.querySelector('.container');
+            if (container) {
+                container.insertBefore(banner, container.firstChild);
+            }
+            
+            // Show the save button and hide delete button for shared characters
+            document.getElementById('save-shared-button').style.display = 'inline-block';
+            document.getElementById('delete-button').style.display = 'none';
+            
+            // Update character info to show it's shared
+            document.getElementById('character-id').textContent = 'Shared Character';
+        }
+
+        function saveSharedCharacter() {
+            if (!currentCharacter || !currentCharacter.shared) return;
+            
+            const saveButton = document.getElementById('save-shared-button');
+            const originalText = saveButton.innerHTML;
+            
+            // Show loading state
+            saveButton.disabled = true;
+            saveButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+            
+            try {
+                // Remove shared flag and generate new ID
+                delete currentCharacter.shared;
+                delete currentCharacter.id;
+                
+                // Save to local storage
+                const id = saveCharacter(currentCharacter);
+                
+                // Update button to show success
+                saveButton.innerHTML = '✅ Saved!';
+                saveButton.classList.remove('btn-outline-success');
+                saveButton.classList.add('btn-success');
+                
+                showAlert(`Character "${currentCharacter.name}" saved to your collection!`, 'success');
+                
+                // Redirect to the saved character after a delay
+                setTimeout(() => {
+                    window.location.href = `character.html?id=${id}`;
+                }, 2000);
+                
+            } catch (error) {
+                // Re-enable button on error
+                saveButton.disabled = false;
+                saveButton.innerHTML = originalText;
+                showAlert('Failed to save character: ' + error.message, 'danger');
             }
         }
     </script>
