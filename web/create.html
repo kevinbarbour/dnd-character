@@ -222,34 +222,54 @@
         });
 
         function initializeForm() {
-            // Populate race dropdown
-            const raceSelect = document.getElementById('character-race');
-            RACES.forEach(race => {
-                const option = document.createElement('option');
-                option.value = race.name;
-                option.textContent = race.name;
-                raceSelect.appendChild(option);
-            });
+            // Check if data is loaded, retry if not
+            if (typeof RACES === 'undefined' || typeof CLASSES === 'undefined' || typeof BACKGROUNDS === 'undefined') {
+                console.log('Data not loaded yet, retrying in 100ms...');
+                setTimeout(initializeForm, 100);
+                return;
+            }
 
-            // Populate class dropdown
-            const classSelect = document.getElementById('character-class');
-            CLASSES.forEach(cls => {
-                const option = document.createElement('option');
-                option.value = cls.name;
-                option.textContent = cls.name;
-                classSelect.appendChild(option);
-            });
+            try {
+                // Populate race dropdown
+                const raceSelect = document.getElementById('character-race');
+                if (raceSelect && RACES && Array.isArray(RACES)) {
+                    RACES.forEach(race => {
+                        const option = document.createElement('option');
+                        option.value = race.name;
+                        option.textContent = race.name;
+                        raceSelect.appendChild(option);
+                    });
+                }
 
-            // Populate background dropdown
-            const backgroundSelect = document.getElementById('character-background');
-            BACKGROUNDS.forEach(bg => {
-                const option = document.createElement('option');
-                option.value = bg.name;
-                option.textContent = bg.name;
-                backgroundSelect.appendChild(option);
-            });
+                // Populate class dropdown
+                const classSelect = document.getElementById('character-class');
+                if (classSelect && CLASSES && Array.isArray(CLASSES)) {
+                    CLASSES.forEach(cls => {
+                        const option = document.createElement('option');
+                        option.value = cls.name;
+                        option.textContent = cls.name;
+                        classSelect.appendChild(option);
+                    });
+                }
 
-            updateAbilityModifiers();
+                // Populate background dropdown
+                const backgroundSelect = document.getElementById('character-background');
+                if (backgroundSelect && BACKGROUNDS && Array.isArray(BACKGROUNDS)) {
+                    BACKGROUNDS.forEach(bg => {
+                        const option = document.createElement('option');
+                        option.value = bg.name;
+                        option.textContent = bg.name;
+                        backgroundSelect.appendChild(option);
+                    });
+                }
+
+                updateAbilityModifiers();
+                console.log('Form initialized successfully');
+            } catch (error) {
+                console.error('Error initializing form:', error);
+                // Retry after a short delay
+                setTimeout(initializeForm, 200);
+            }
         }
 
         function setupEventListeners() {
