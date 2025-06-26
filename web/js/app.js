@@ -476,38 +476,139 @@ function copyShareURL(character) {
         return;
     }
     
-    // Copy to clipboard
-    if (navigator.clipboard) {
+    // Try modern clipboard API first (requires HTTPS in Safari)
+    if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(shareURL).then(() => {
             showAlert('Share URL copied to clipboard!', 'success');
-        }).catch(() => {
-            // Fallback for older browsers
+        }).catch((err) => {
+            console.log('Clipboard API failed, trying fallback:', err);
             fallbackCopyToClipboard(shareURL);
         });
     } else {
+        // Use fallback for Safari on HTTP or older browsers
         fallbackCopyToClipboard(shareURL);
     }
 }
 
 function fallbackCopyToClipboard(text) {
+    // Create a temporary input element
     const textArea = document.createElement('textarea');
     textArea.value = text;
+    
+    // Make it invisible but accessible
     textArea.style.position = 'fixed';
-    textArea.style.left = '-999999px';
-    textArea.style.top = '-999999px';
+    textArea.style.left = '-9999px';
+    textArea.style.top = '-9999px';
+    textArea.style.opacity = '0';
+    textArea.style.pointerEvents = 'none';
+    textArea.style.tabIndex = '-1';
+    
+    // Add to DOM
     document.body.appendChild(textArea);
+    
+    // Focus and select
     textArea.focus();
     textArea.select();
+    textArea.setSelectionRange(0, text.length);
     
     try {
-        document.execCommand('copy');
-        showAlert('Share URL copied to clipboard!', 'success');
+        // Try the old execCommand method
+        const successful = document.execCommand('copy');
+        if (successful) {
+            showAlert('Share URL copied to clipboard!', 'success');
+        } else {
+            // If execCommand fails, show the URL for manual copying
+            showShareURLModal(text);
+        }
     } catch (err) {
-        showAlert('Failed to copy URL. Please copy manually: ' + text, 'warning');
+        console.log('execCommand failed:', err);
+        // Show modal with URL for manual copying
+        showShareURLModal(text);
+    } finally {
+        // Clean up
+        document.body.removeChild(textArea);
     }
-    
-    document.body.removeChild(textArea);
 }
+
+function showShareURLModal(shareURL) {
+    // Create modal for manual copying (especially useful for Safari)
+    const modal = document.createElement('div');
+    modal.className = 'modal fade show';
+    modal.style.display = 'block';
+    modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Share Character</h5>
+                    <button type="button" class="btn-close" onclick="this.closest('.modal').remove()"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Copy this URL to share your character:</p>
+                    <div class="input-group">
+                        <input type="text" class="form-control" value="${shareURL}" id="share-url-input" readonly>
+                        <button class="btn btn-outline-secondary" type="button" onclick="selectShareURL()">
+                            Select All
+                        </button>
+                    </div>
+                    <small class="text-muted mt-2 d-block">
+                        Tip: Tap and hold on mobile to select the URL, or use Cmd+A (Mac) / Ctrl+A (PC) to select all.
+                    </small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="tryAgainCopy('${shareURL}')">
+                        Try Copy Again
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Auto-select the URL
+    setTimeout(() => {
+        const input = document.getElementById('share-url-input');
+        if (input) {
+            input.focus();
+            input.select();
+        }
+    }, 100);
+}
+
+// Helper functions for the modal
+window.selectShareURL = function() {
+    const input = document.getElementById('share-url-input');
+    if (input) {
+        input.focus();
+        input.select();
+        input.setSelectionRange(0, input.value.length);
+    }
+};
+
+window.tryAgainCopy = function(shareURL) {
+    // Try copying again
+    const input = document.getElementById('share-url-input');
+    if (input) {
+        input.focus();
+        input.select();
+        
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                showAlert('Share URL copied to clipboard!', 'success');
+                document.querySelector('.modal').remove();
+            } else {
+                showAlert('Please manually copy the URL above', 'info');
+            }
+        } catch (err) {
+            showAlert('Please manually copy the URL above', 'info');
+        }
+    }
+};
 
 // Character sharing function
 function shareCharacter(id) {
