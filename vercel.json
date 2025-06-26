@@ -1,0 +1,47 @@
+{
+  "functions": {
+    "api/**/*.go": {
+      "runtime": "go1.x"
+    }
+  },
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/public/static/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/api/index"
+    },
+    {
+      "src": "/characters$",
+      "dest": "/api/characters"
+    },
+    {
+      "src": "/characters/new",
+      "dest": "/api/characters/new"
+    },
+    {
+      "src": "/characters/([0-9]+)",
+      "dest": "/api/characters/view?id=$1"
+    },
+    {
+      "src": "/characters/([0-9]+)/delete",
+      "dest": "/api/characters/delete?id=$1"
+    },
+    {
+      "src": "/api/generate-abilities",
+      "dest": "/api/generate-abilities"
+    },
+    {
+      "src": "/api/spells/(.*)",
+      "dest": "/api/spells?class=$1"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index"
+    }
+  ]
+}

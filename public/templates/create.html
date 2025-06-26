@@ -1,0 +1,211 @@
+{{define "content"}}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">
+                    <i class="bi bi-plus-circle"></i> Create New Character
+                </h3>
+            </div>
+            <div class="card-body">
+                <form id="characterForm" method="POST" action="/characters/new">
+                    <!-- Character Name -->
+                    <div class="mb-4">
+                        <label for="name" class="form-label">
+                            <i class="bi bi-person"></i> Character Name
+                        </label>
+                        <input type="text" class="form-control" id="name" name="name" required 
+                               placeholder="Enter your character's name" maxlength="50">
+                    </div>
+
+                    <!-- Ability Score Generation -->
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="bi bi-dice-6"></i> Ability Score Generation Method
+                        </label>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="card method-card" data-method="dice">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-dice-5 text-warning display-6"></i>
+                                        <h6 class="mt-2">Dice Roll</h6>
+                                        <small class="text-muted">4d6 drop lowest</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card method-card" data-method="pointbuy">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-calculator text-info display-6"></i>
+                                        <h6 class="mt-2">Point Buy</h6>
+                                        <small class="text-muted">27 points</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card method-card" data-method="standard">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-list-ol text-success display-6"></i>
+                                        <h6 class="mt-2">Standard Array</h6>
+                                        <small class="text-muted">15,14,13,12,10,8</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" id="generateBtn" class="btn btn-outline-primary mt-3" disabled>
+                            <i class="bi bi-arrow-clockwise"></i> Generate Ability Scores
+                        </button>
+                    </div>
+
+                    <!-- Ability Scores -->
+                    <div class="mb-4" id="abilityScores" style="display: none;">
+                        <label class="form-label">
+                            <i class="bi bi-bar-chart"></i> Ability Scores
+                        </label>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="strength" class="form-label">Strength</label>
+                                <input type="number" class="form-control" id="strength" name="strength" 
+                                       min="3" max="18" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="dexterity" class="form-label">Dexterity</label>
+                                <input type="number" class="form-control" id="dexterity" name="dexterity" 
+                                       min="3" max="18" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="constitution" class="form-label">Constitution</label>
+                                <input type="number" class="form-control" id="constitution" name="constitution" 
+                                       min="3" max="18" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="intelligence" class="form-label">Intelligence</label>
+                                <input type="number" class="form-control" id="intelligence" name="intelligence" 
+                                       min="3" max="18" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="wisdom" class="form-label">Wisdom</label>
+                                <input type="number" class="form-control" id="wisdom" name="wisdom" 
+                                       min="3" max="18" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="charisma" class="form-label">Charisma</label>
+                                <input type="number" class="form-control" id="charisma" name="charisma" 
+                                       min="3" max="18" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Race Selection -->
+                    <div class="mb-4">
+                        <label for="race" class="form-label">
+                            <i class="bi bi-people"></i> Race
+                        </label>
+                        <select class="form-select" id="race" name="race" required>
+                            <option value="">Choose a race...</option>
+                            {{range .Races}}
+                            <option value="{{.Name}}">{{.Name}} - {{.Description}}</option>
+                            {{end}}
+                        </select>
+                        <div id="raceInfo" class="mt-2 text-muted small"></div>
+                    </div>
+
+                    <!-- Class Selection -->
+                    <div class="mb-4">
+                        <label for="class" class="form-label">
+                            <i class="bi bi-shield"></i> Class
+                        </label>
+                        <select class="form-select" id="class" name="class" required>
+                            <option value="">Choose a class...</option>
+                            {{range .Classes}}
+                            <option value="{{.Name}}">{{.Name}} - {{.Description}}</option>
+                            {{end}}
+                        </select>
+                        <div id="classInfo" class="mt-2 text-muted small"></div>
+                    </div>
+
+                    <!-- Background Selection -->
+                    <div class="mb-4">
+                        <label for="background" class="form-label">
+                            <i class="bi bi-book"></i> Background
+                        </label>
+                        <select class="form-select" id="background" name="background" required>
+                            <option value="">Choose a background...</option>
+                            {{range .Backgrounds}}
+                            <option value="{{.Name}}">{{.Name}} - {{.Description}}</option>
+                            {{end}}
+                        </select>
+                        <div id="backgroundInfo" class="mt-2 text-muted small"></div>
+                    </div>
+
+                    <!-- Character Preview -->
+                    <div class="mb-4" id="characterPreview" style="display: none;">
+                        <h5><i class="bi bi-eye"></i> Character Preview</h5>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div id="previewContent">
+                                    <!-- Preview will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="/" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-success" id="submitBtn" disabled>
+                            <i class="bi bi-save"></i> Create Character
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Store data for JavaScript access
+window.raceData = {};
+window.classData = {};
+window.backgroundData = {};
+
+{{range .Races}}
+window.raceData["{{.Name}}"] = {
+    "name": "{{.Name}}",
+    "description": "{{.Description}}",
+    "size": "{{.Size}}",
+    "speed": {{.Speed}},
+    "traits": [{{range $i, $trait := .Traits}}{{if $i}}, {{end}}"{{$trait}}"{{end}}],
+    "bonuses": {
+        "strength": {{.StrengthBonus}},
+        "dexterity": {{.DexterityBonus}},
+        "constitution": {{.ConstitutionBonus}},
+        "intelligence": {{.IntelligenceBonus}},
+        "wisdom": {{.WisdomBonus}},
+        "charisma": {{.CharismaBonus}}
+    }
+};
+{{end}}
+
+{{range .Classes}}
+window.classData["{{.Name}}"] = {
+    "name": "{{.Name}}",
+    "description": "{{.Description}}",
+    "hitDie": {{.HitDie}},
+    "primaryAbility": "{{.PrimaryAbility}}",
+    "savingThrows": [{{range $i, $save := .SavingThrows}}{{if $i}}, {{end}}"{{$save}}"{{end}}]
+};
+{{end}}
+
+{{range .Backgrounds}}
+window.backgroundData["{{.Name}}"] = {
+    "name": "{{.Name}}",
+    "description": "{{.Description}}",
+    "skills": [{{range $i, $skill := .Skills}}{{if $i}}, {{end}}"{{$skill}}"{{end}}],
+    "feature": "{{.Feature}}"
+};
+{{end}}
+</script>
+{{end}}

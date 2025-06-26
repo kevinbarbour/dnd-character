@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}} - D&D 5e Character Creator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/css/custom.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-dice-6"></i>
+                D&D 5e Character Creator
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/characters/new">
+                            <i class="bi bi-plus-circle"></i> Create Character
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/characters">
+                            <i class="bi bi-people"></i> My Characters
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>
+                        <i class="bi bi-person-badge"></i> {{.Character.Character.Name}}
+                    </h2>
+                    <div>
+                        <a href="/characters" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Characters
+                        </a>
+                        <form method="POST" action="/characters/{{.Character.ID}}/delete" class="d-inline" 
+                              onsubmit="return confirm('Are you sure you want to delete {{.Character.Character.Name}}?')">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card shadow-lg">
+                    <div class="card-header bg-primary text-white">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">{{.Character.Character.Name}}</h3>
+                                <p class="mb-0">Level {{.Character.Character.Level}} {{.Character.Character.Race.Name}} {{.Character.Character.Class.Name}}</p>
+                            </div>
+                            <div class="col-auto">
+                                <span class="badge bg-light text-dark fs-6">ID: {{.Character.ID}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Character Overview -->
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-4">
+                                <div class="card bg-light h-100">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-person-circle text-primary display-4"></i>
+                                        <h5 class="mt-2">{{.Character.Character.Race.Name}}</h5>
+                                        <p class="text-muted mb-0">{{.Character.Character.Race.Description}}</p>
+                                        <small class="text-muted">
+                                            Size: {{.Character.Character.Race.Size}} | Speed: {{.Character.Character.Race.Speed}} ft
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-light h-100">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-shield text-success display-4"></i>
+                                        <h5 class="mt-2">{{.Character.Character.Class.Name}}</h5>
+                                        <p class="text-muted mb-0">{{.Character.Character.Class.Description}}</p>
+                                        <small class="text-muted">
+                                            Hit Die: d{{.Character.Character.Class.HitDie}} | Primary: {{.Character.Character.Class.PrimaryAbility}}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-light h-100">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-book text-warning display-4"></i>
+                                        <h5 class="mt-2">{{.Character.Character.Background.Name}}</h5>
+                                        <p class="text-muted mb-0">{{.Character.Character.Background.Description}}</p>
+                                        <small class="text-muted">
+                                            Feature: {{.Character.Character.Background.Feature}}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ability Scores -->
+                        <div class="mb-4">
+                            <h4><i class="bi bi-bar-chart"></i> Ability Scores</h4>
+                            <div class="row g-3">
+                                <div class="col-md-2">
+                                    <div class="card text-center">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-muted">STR</h6>
+                                            <h3 class="text-primary">{{.Character.Character.Abilities.Strength}}</h3>
+                                            <small class="text-muted">
+                                                {{if ge .Character.Character.Abilities.GetStrengthModifier 0}}+{{end}}{{.Character.Character.Abilities.GetStrengthModifier}}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="card text-center">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-muted">DEX</h6>
+                                            <h3 class="text-success">{{.Character.Character.Abilities.Dexterity}}</h3>
+                                            <small class="text-muted">
+                                                {{if ge .Character.Character.Abilities.GetDexterityModifier 0}}+{{end}}{{.Character.Character.Abilities.GetDexterityModifier}}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="card text-center">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-muted">CON</h6>
+                                            <h3 class="text-danger">{{.Character.Character.Abilities.Constitution}}</h3>
+                                            <small class="text-muted">
+                                                {{if ge .Character.Character.Abilities.GetConstitutionModifier 0}}+{{end}}{{.Character.Character.Abilities.GetConstitutionModifier}}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="card text-center">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-muted">INT</h6>
+                                            <h3 class="text-info">{{.Character.Character.Abilities.Intelligence}}</h3>
+                                            <small class="text-muted">
+                                                {{if ge .Character.Character.Abilities.GetIntelligenceModifier 0}}+{{end}}{{.Character.Character.Abilities.GetIntelligenceModifier}}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="card text-center">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-muted">WIS</h6>
+                                            <h3 class="text-warning">{{.Character.Character.Abilities.Wisdom}}</h3>
+                                            <small class="text-muted">
+                                                {{if ge .Character.Character.Abilities.GetWisdomModifier 0}}+{{end}}{{.Character.Character.Abilities.GetWisdomModifier}}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="card text-center">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-muted">CHA</h6>
+                                            <h3 class="text-secondary">{{.Character.Character.Abilities.Charisma}}</h3>
+                                            <small class="text-muted">
+                                                {{if ge .Character.Character.Abilities.GetCharismaModifier 0}}+{{end}}{{.Character.Character.Abilities.GetCharismaModifier}}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Combat Stats -->
+                        <div class="mb-4">
+                            <h4><i class="bi bi-shield-shaded"></i> Combat Stats</h4>
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <div class="card bg-success text-white text-center">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Hit Points</h6>
+                                            <h3>{{.Character.Character.GetHitPoints}}</h3>
+                                            <small>d{{.Character.Character.Class.HitDie}} + CON modifier</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card bg-info text-white text-center">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Armor Class</h6>
+                                            <h3>{{add 10 .Character.Character.Abilities.GetDexterityModifier}}</h3>
+                                            <small>10 + DEX modifier</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card bg-warning text-white text-center">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Speed</h6>
+                                            <h3>{{.Character.Character.Race.Speed}}</h3>
+                                            <small>feet per turn</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card bg-secondary text-white text-center">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Level</h6>
+                                            <h3>{{.Character.Character.Level}}</h3>
+                                            <small>character level</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Racial Traits -->
+                        {{if .Character.Character.Race.Traits}}
+                        <div class="mb-4">
+                            <h4><i class="bi bi-star"></i> Racial Traits</h4>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <div class="row">
+                                        {{range .Character.Character.Race.Traits}}
+                                        <div class="col-md-6 mb-2">
+                                            <span class="badge bg-primary me-2">{{.}}</span>
+                                        </div>
+                                        {{end}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{end}}
+
+                        <!-- Class Features -->
+                        <div class="mb-4">
+                            <h4><i class="bi bi-gear"></i> Class Features</h4>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <strong>Saving Throws:</strong>
+                                            {{range $i, $save := .Character.Character.Class.SavingThrows}}
+                                                {{if $i}}, {{end}}{{$save}}
+                                            {{end}}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <strong>Hit Die:</strong> d{{.Character.Character.Class.HitDie}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Background Features -->
+                        <div class="mb-4">
+                            <h4><i class="bi bi-journal"></i> Background</h4>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <strong>Skills:</strong>
+                                            {{range $i, $skill := .Character.Character.Background.Skills}}
+                                                {{if $i}}, {{end}}{{$skill}}
+                                            {{end}}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <strong>Feature:</strong> {{.Character.Character.Background.Feature}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Character Metadata -->
+                        <div class="row g-3 text-muted small">
+                            <div class="col-md-6">
+                                <strong>Created:</strong> {{.Character.CreatedAt.Format "January 2, 2006 at 3:04 PM"}}
+                            </div>
+                            <div class="col-md-6">
+                                {{if not .Character.UpdatedAt.Equal .Character.CreatedAt}}
+                                <strong>Last Updated:</strong> {{.Character.UpdatedAt.Format "January 2, 2006 at 3:04 PM"}}
+                                {{else}}
+                                <strong>Status:</strong> Never modified
+                                {{end}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-light mt-5 py-4">
+        <div class="container text-center">
+            <p>&copy; 2025 D&D 5e Character Creator. Built with Go and Bootstrap.</p>
+            <p class="small text-muted">
+                Dungeons & Dragons content is owned by Wizards of the Coast.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

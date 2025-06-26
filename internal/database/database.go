@@ -4,28 +4,27 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
-	"path/filepath"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 )
-
-const dbFileName = "dnd_characters.db"
 
 // DB holds the database connection
 var DB *sql.DB
 
-// InitDB initializes the SQLite database
+// InitDB initializes the PostgreSQL database
 func InitDB() error {
-	// Get the directory where the executable is located
-	execPath, err := os.Executable()
-	if err != nil {
-		return fmt.Errorf("failed to get executable path: %w", err)
+	// Get database URL from environment variable
+	databaseURL := os.Getenv("POSTGRES_URL")
+	if databaseURL == "" {
+		// Fallback for local development
+		databaseURL = os.Getenv("DATABASE_URL")
+		if databaseURL == "" {
+			return fmt.Errorf("POSTGRES_URL or DATABASE_URL environment variable is required")
+		}
 	}
 
-	dbPath := filepath.Join(filepath.Dir(execPath), dbFileName)
-
 	// Open database connection
-	db, err := sql.Open("sqlite3", dbPath)
+	db, err := sql.Open("postgres", databaseURL)
 	if err != nil {
 		return fmt.Errorf("failed to open database: %w", err)
 	}
@@ -49,11 +48,11 @@ func InitDB() error {
 func createTables() error {
 	createCharactersTable := `
 	CREATE TABLE IF NOT EXISTS characters (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		name TEXT NOT NULL,
-		race TEXT NOT NULL,
-		class TEXT NOT NULL,
-		background TEXT NOT NULL,
+		id SERIAL PRIMARY KEY,
+		name VARCHAR(255) NOT NULL,
+		race VARCHAR(100) NOT NULL,
+		class VARCHAR(100) NOT NULL,
+		background VARCHAR(100) NOT NULL,
 		level INTEGER DEFAULT 1,
 		strength INTEGER NOT NULL,
 		dexterity INTEGER NOT NULL,
@@ -61,8 +60,8 @@ func createTables() error {
 		intelligence INTEGER NOT NULL,
 		wisdom INTEGER NOT NULL,
 		charisma INTEGER NOT NULL,
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	);`
 
 	_, err := DB.Exec(createCharactersTable)
@@ -72,10 +71,9 @@ func createTables() error {
 
 	createCharacterSpellsTable := `
 	CREATE TABLE IF NOT EXISTS character_spells (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		character_id INTEGER NOT NULL,
-		spell_name TEXT NOT NULL,
-		FOREIGN KEY (character_id) REFERENCES characters (id) ON DELETE CASCADE,
+		id SERIAL PRIMARY KEY,
+		character_id INTEGER NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+		spell_name VARCHAR(255) NOT NULL,
 		UNIQUE(character_id, spell_name)
 	);`
 
@@ -93,13 +91,4 @@ func CloseDB() error {
 		return DB.Close()
 	}
 	return nil
-}
-
-// GetDBPath returns the path to the database file
-func GetDBPath() (string, error) {
-	execPath, err := os.Executable()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(filepath.Dir(execPath), dbFileName), nil
 }
