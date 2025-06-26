@@ -124,6 +124,9 @@ function initCharacterCreation() {
             classInfo.innerHTML = '';
         }
         
+        // Handle spell selection for spellcasters
+        updateSpellSelection(className);
+        
         updateFormValidation();
         updateCharacterPreview();
     });
@@ -348,3 +351,123 @@ document.addEventListener('DOMContentLoaded', function() {
         card.setAttribute('aria-label', `Select ${card.querySelector('h6').textContent} method`);
     });
 });
+
+// Spell selection functionality
+function updateSpellSelection(className) {
+    const spellSelectionDiv = document.getElementById('spellSelection');
+    
+    if (!className) {
+        spellSelectionDiv.style.display = 'none';
+        return;
+    }
+    
+    // Check if class is a spellcaster
+    const spellcasters = ['Wizard', 'Cleric', 'Bard', 'Sorcerer', 'Warlock', 'Druid'];
+    if (!spellcasters.includes(className)) {
+        spellSelectionDiv.style.display = 'none';
+        return;
+    }
+    
+    // Show spell selection
+    spellSelectionDiv.style.display = 'block';
+    
+    // Get spell allocation for this class
+    const spellAllocation = getSpellAllocation(className);
+    document.getElementById('cantripCount').textContent = spellAllocation.cantrips;
+    document.getElementById('spellCount').textContent = spellAllocation.spells;
+    
+    // Load spells for this class
+    loadSpellsForClass(className);
+}
+
+function getSpellAllocation(className) {
+    const allocations = {
+        'Wizard': { cantrips: 3, spells: 2 },
+        'Cleric': { cantrips: 3, spells: 2 },
+        'Bard': { cantrips: 2, spells: 4 },
+        'Sorcerer': { cantrips: 4, spells: 2 },
+        'Warlock': { cantrips: 2, spells: 2 },
+        'Druid': { cantrips: 2, spells: 2 }
+    };
+    return allocations[className] || { cantrips: 0, spells: 0 };
+}
+
+function loadSpellsForClass(className) {
+    // Fetch spells from the server
+    fetch(`/api/spells/${className}`)
+        .then(response => response.json())
+        .then(data => {
+            populateSpellList('cantripList', data.cantrips, 'cantrip');
+            populateSpellList('spellList', data.firstLevel, 'spell');
+        })
+        .catch(error => {
+            console.error('Error loading spells:', error);
+            // Fallback to client-side spell data if available
+            if (window.spellData && window.spellData[className]) {
+                const spells = window.spellData[className];
+                populateSpellList('cantripList', spells.cantrips, 'cantrip');
+                populateSpellList('spellList', spells.firstLevel, 'spell');
+            }
+        });
+}
+
+function populateSpellList(containerId, spells, type) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    
+    spells.forEach(spell => {
+        const spellCard = document.createElement('div');
+        spellCard.className = 'col-md-6 col-lg-4';
+        spellCard.innerHTML = `
+            <div class="card spell-card" data-spell="${spell.Name}" data-type="${type}">
+                <div class="card-body p-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="${type}s" value="${spell.Name}" id="${type}_${spell.Name.replace(/\s+/g, '_')}">
+                        <label class="form-check-label" for="${type}_${spell.Name.replace(/\s+/g, '_')}">
+                            <strong>${spell.Name}</strong>
+                            <small class="text-muted d-block">${spell.School}</small>
+                            <small class="text-muted">${spell.Description}</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.appendChild(spellCard);
+    });
+    
+    // Add event listeners for spell selection
+    const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            validateSpellSelection(type);
+        });
+    });
+}
+
+function validateSpellSelection(type) {
+    const className = document.getElementById('class').value;
+    const allocation = getSpellAllocation(className);
+    const maxAllowed = type === 'cantrip' ? allocation.cantrips : allocation.spells;
+    
+    const checkboxes = document.querySelectorAll(`input[name="${type}s"]:checked`);
+    const selectedCount = checkboxes.length;
+    
+    // Update counter
+    const countElement = document.getElementById(type === 'cantrip' ? 'cantripCount' : 'spellCount');
+    countElement.textContent = `${selectedCount}/${maxAllowed}`;
+    
+    // Disable other checkboxes if limit reached
+    const allCheckboxes = document.querySelectorAll(`input[name="${type}s"]`);
+    allCheckboxes.forEach(checkbox => {
+        if (!checkbox.checked && selectedCount >= maxAllowed) {
+            checkbox.disabled = true;
+            checkbox.parentElement.parentElement.parentElement.classList.add('disabled');
+        } else {
+            checkbox.disabled = false;
+            checkbox.parentElement.parentElement.parentElement.classList.remove('disabled');
+        }
+    });
+    
+    // Update form validation
+    updateFormValidation();
+}

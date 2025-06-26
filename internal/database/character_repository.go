@@ -18,6 +18,14 @@ type SavedCharacter struct {
 
 // SaveCharacter saves a character to the database
 func SaveCharacter(char character.Character) (int, error) {
+	// Start a transaction
+	tx, err := DB.Begin()
+	if err != nil {
+		return 0, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	// Insert character
 	query := `
 		INSERT INTO characters (
 			name, race, class, background, level,
@@ -25,7 +33,7 @@ func SaveCharacter(char character.Character) (int, error) {
 		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`
 
-	result, err := DB.Exec(query,
+	result, err := tx.Exec(query,
 		char.Name,
 		char.Race.Name,
 		char.Class.Name,
@@ -48,7 +56,51 @@ func SaveCharacter(char character.Character) (int, error) {
 		return 0, fmt.Errorf("failed to get character ID: %w", err)
 	}
 
-	return int(id), nil
+	characterID := int(id)
+
+	// Insert spells
+	if len(char.Spells) > 0 {
+		spellQuery := `INSERT INTO character_spells (character_id, spell_name) VALUES (?, ?)`
+		for _, spellName := range char.Spells {
+			_, err := tx.Exec(spellQuery, characterID, spellName)
+			if err != nil {
+				return 0, fmt.Errorf("failed to save spell %s: %w", spellName, err)
+			}
+		}
+	}
+
+	// Commit transaction
+	if err := tx.Commit(); err != nil {
+		return 0, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return characterID, nil
+}
+
+// loadCharacterSpells loads spells for a character
+func loadCharacterSpells(characterID int) ([]string, error) {
+	query := `SELECT spell_name FROM character_spells WHERE character_id = ? ORDER BY spell_name`
+
+	rows, err := DB.Query(query, characterID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query character spells: %w", err)
+	}
+	defer rows.Close()
+
+	var spells []string
+	for rows.Next() {
+		var spellName string
+		if err := rows.Scan(&spellName); err != nil {
+			return nil, fmt.Errorf("failed to scan spell: %w", err)
+		}
+		spells = append(spells, spellName)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating spells: %w", err)
+	}
+
+	return spells, nil
 }
 
 // GetAllCharacters retrieves all characters from the database
@@ -103,6 +155,13 @@ func GetAllCharacters() ([]SavedCharacter, error) {
 		if background, found := character.GetBackgroundByName(backgroundName); found {
 			saved.Character.Background = background
 		}
+
+		// Load spells
+		spells, err := loadCharacterSpells(saved.ID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load spells for character %d: %w", saved.ID, err)
+		}
+		saved.Character.Spells = spells
 
 		characters = append(characters, saved)
 	}
@@ -161,6 +220,13 @@ func GetCharacterByID(id int) (*SavedCharacter, error) {
 	if background, found := character.GetBackgroundByName(backgroundName); found {
 		saved.Character.Background = background
 	}
+
+	// Load spells
+	spells, err := loadCharacterSpells(saved.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load spells for character %d: %w", saved.ID, err)
+	}
+	saved.Character.Spells = spells
 
 	return &saved, nil
 }

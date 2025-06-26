@@ -166,6 +166,33 @@
                                 <div id="classInfo" class="mt-2 text-muted small"></div>
                             </div>
 
+                            <!-- Spell Selection (for spellcasters) -->
+                            <div class="mb-4" id="spellSelection" style="display: none;">
+                                <h5><i class="bi bi-stars"></i> Spell Selection</h5>
+                                
+                                <!-- Cantrips -->
+                                <div class="mb-3" id="cantripSection">
+                                    <label class="form-label">Cantrips</label>
+                                    <div class="spell-info mb-2">
+                                        <small class="text-muted">Select <span id="cantripCount">0</span> cantrips</small>
+                                    </div>
+                                    <div id="cantripList" class="row g-2">
+                                        <!-- Cantrips will be populated by JavaScript -->
+                                    </div>
+                                </div>
+
+                                <!-- First Level Spells -->
+                                <div class="mb-3" id="spellSection">
+                                    <label class="form-label">1st Level Spells</label>
+                                    <div class="spell-info mb-2">
+                                        <small class="text-muted">Select <span id="spellCount">0</span> spells</small>
+                                    </div>
+                                    <div id="spellList" class="row g-2">
+                                        <!-- Spells will be populated by JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Background Selection -->
                             <div class="mb-4">
                                 <label for="background" class="form-label">

@@ -10,6 +10,7 @@ type Character struct {
 	Background Background
 	Abilities  AbilityScores
 	Level      int
+	Spells     []string // List of spell names the character knows
 }
 
 // AbilityScores represents the six core ability scores

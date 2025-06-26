@@ -191,6 +191,39 @@ func (h *WebHandler) GenerateAbilitiesHandler(w http.ResponseWriter, r *http.Req
 	json.NewEncoder(w).Encode(abilities)
 }
 
+// SpellsHandler returns spells for a given class
+func (h *WebHandler) SpellsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Extract class name from URL path
+	pathParts := strings.Split(r.URL.Path, "/")
+	if len(pathParts) < 4 {
+		http.Error(w, "Invalid class name", http.StatusBadRequest)
+		return
+	}
+
+	className := pathParts[3]
+
+	// Get spells for the class
+	spellList := character.GetSpellsForClass(className)
+
+	// Return as JSON
+	w.Header().Set("Content-Type", "application/json")
+	response := struct {
+		Cantrips    []character.Spell `json:"cantrips"`
+		FirstLevel  []character.Spell `json:"firstLevel"`
+		BonusSpells []character.Spell `json:"bonusSpells"`
+	}{
+		Cantrips:    spellList.Cantrips,
+		FirstLevel:  spellList.FirstLevel,
+		BonusSpells: spellList.BonusSpells,
+	}
+	json.NewEncoder(w).Encode(response)
+}
+
 // createCharacterFromForm creates a character from form data
 func (h *WebHandler) createCharacterFromForm(r *http.Request) (character.Character, error) {
 	var char character.Character
@@ -235,6 +268,21 @@ func (h *WebHandler) createCharacterFromForm(r *http.Request) (character.Charact
 	// Apply racial bonuses
 	abilities.ApplyRacialBonuses(race)
 	char.Abilities = abilities
+
+	// Get spells if the class is a spellcaster
+	if character.IsSpellcaster(className) {
+		spells := []string{}
+
+		// Get cantrips
+		cantrips := r.Form["cantrips"]
+		spells = append(spells, cantrips...)
+
+		// Get first level spells
+		firstLevelSpells := r.Form["spells"]
+		spells = append(spells, firstLevelSpells...)
+
+		char.Spells = spells
+	}
 
 	return char, nil
 }

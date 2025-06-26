@@ -70,6 +70,20 @@ func createTables() error {
 		return fmt.Errorf("failed to create characters table: %w", err)
 	}
 
+	createCharacterSpellsTable := `
+	CREATE TABLE IF NOT EXISTS character_spells (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		character_id INTEGER NOT NULL,
+		spell_name TEXT NOT NULL,
+		FOREIGN KEY (character_id) REFERENCES characters (id) ON DELETE CASCADE,
+		UNIQUE(character_id, spell_name)
+	);`
+
+	_, err = DB.Exec(createCharacterSpellsTable)
+	if err != nil {
+		return fmt.Errorf("failed to create character_spells table: %w", err)
+	}
+
 	return nil
 }
 

@@ -59,6 +59,7 @@ func startWebServer(port string) {
 		}
 	})
 	http.HandleFunc("/api/generate-abilities", webHandler.GenerateAbilitiesHandler)
+	http.HandleFunc("/api/spells/", webHandler.SpellsHandler)
 	http.HandleFunc("/static/", handlers.StaticHandler)
 
 	fmt.Printf("🚀 Server running at http://localhost:%s\n", port)

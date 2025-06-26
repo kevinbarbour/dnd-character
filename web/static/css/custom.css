@@ -289,3 +289,42 @@ body {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* Spell selection styling */
+.spell-card {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid #dee2e6;
+}
+
+.spell-card:hover {
+    border-color: #007bff;
+    box-shadow: 0 2px 8px rgba(0,123,255,0.15);
+    transform: translateY(-1px);
+}
+
+.spell-card.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.spell-card .form-check-input:checked ~ .form-check-label {
+    color: #007bff;
+    font-weight: 600;
+}
+
+.spell-card .form-check-label {
+    cursor: pointer;
+    width: 100%;
+}
+
+#spellSelection {
+    border-left: 4px solid #6f42c1;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+}
+
+.spell-info {
+    font-style: italic;
+}
