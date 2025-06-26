@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}} - D&D 5e Character Creator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/css/custom.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-dice-6"></i>
+                D&D 5e Character Creator
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/characters/new">
+                            <i class="bi bi-plus-circle"></i> Create Character
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/characters">
+                            <i class="bi bi-people"></i> My Characters
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <div class="hero-section mb-5">
+                    <h1 class="display-4 mb-4">
+                        <i class="bi bi-dice-6 text-primary"></i>
+                        Welcome to D&D 5e Character Creator
+                    </h1>
+                    <p class="lead mb-4">
+                        Create, manage, and explore your Dungeons & Dragons 5th Edition characters with ease.
+                        Build heroes with authentic D&D rules and save them for your adventures.
+                    </p>
+                </div>
+
+                <div class="row g-4 mb-5">
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="bi bi-plus-circle-fill text-success display-4 mb-3"></i>
+                                <h5 class="card-title">Create New Character</h5>
+                                <p class="card-text">
+                                    Start your adventure by creating a new D&D 5e character.
+                                    Choose from 9 races, 12 classes, and multiple ability generation methods.
+                                </p>
+                                <a href="/characters/new" class="btn btn-success btn-lg">
+                                    <i class="bi bi-plus-circle"></i> Create Character
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="bi bi-people-fill text-primary display-4 mb-3"></i>
+                                <h5 class="card-title">My Characters</h5>
+                                <p class="card-text">
+                                    View and manage your saved characters.
+                                    {{if gt .CharacterCount 0}}
+                                        You have {{.CharacterCount}} character{{if ne .CharacterCount 1}}s{{end}} saved.
+                                    {{else}}
+                                        No characters saved yet. Create your first one!
+                                    {{end}}
+                                </p>
+                                <a href="/characters" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-people"></i> View Characters
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="features-section">
+                    <h2 class="mb-4">Features</h2>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="feature-item text-center">
+                                <i class="bi bi-dice-5 text-warning display-5 mb-3"></i>
+                                <h5>Authentic D&D 5e Rules</h5>
+                                <p class="text-muted">
+                                    Complete implementation of D&D 5th Edition character creation rules,
+                                    including racial bonuses and class features.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item text-center">
+                                <i class="bi bi-palette text-info display-5 mb-3"></i>
+                                <h5>Multiple Generation Methods</h5>
+                                <p class="text-muted">
+                                    Choose from dice rolling (4d6 drop lowest), point buy system,
+                                    or standard array for ability score generation.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item text-center">
+                                <i class="bi bi-save text-success display-5 mb-3"></i>
+                                <h5>Save & Manage</h5>
+                                <p class="text-muted">
+                                    Save your characters to a local database and manage them easily.
+                                    View, edit, or delete characters as needed.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-overview mt-5">
+                    <h3 class="mb-4">Available Content</h3>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="content-card p-3 border rounded">
+                                <h6 class="text-primary mb-2">
+                                    <i class="bi bi-person"></i> 9 Races
+                                </h6>
+                                <small class="text-muted">
+                                    Human, Elf, Dwarf, Halfling, Dragonborn, Gnome, Half-Elf, Half-Orc, Tiefling
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="content-card p-3 border rounded">
+                                <h6 class="text-success mb-2">
+                                    <i class="bi bi-sword"></i> 12 Classes
+                                </h6>
+                                <small class="text-muted">
+                                    Fighter, Wizard, Rogue, Cleric, Ranger, Paladin, Barbarian, Bard, Druid, Monk, Sorcerer, Warlock
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="content-card p-3 border rounded">
+                                <h6 class="text-warning mb-2">
+                                    <i class="bi bi-book"></i> 6 Backgrounds
+                                </h6>
+                                <small class="text-muted">
+                                    Acolyte, Criminal, Folk Hero, Noble, Sage, Soldier
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-light mt-5 py-4">
+        <div class="container text-center">
+            <p>&copy; 2025 D&D 5e Character Creator. Built with Go and Bootstrap.</p>
+            <p class="small text-muted">
+                Dungeons & Dragons content is owned by Wizards of the Coast.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,22 +1,77 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/kevinbarbour/dungeon-and-dragon/internal/character"
 	"github.com/kevinbarbour/dungeon-and-dragon/internal/database"
 	"github.com/kevinbarbour/dungeon-and-dragon/internal/ui"
+	"github.com/kevinbarbour/dungeon-and-dragon/web/handlers"
 )
 
 func main() {
+	// Parse command line flags
+	webMode := flag.Bool("web", false, "Run in web server mode")
+	port := flag.String("port", "8080", "Port to run web server on")
+	flag.Parse()
+
 	// Initialize database
 	if err := database.InitDB(); err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 	defer database.CloseDB()
 
+	if *webMode {
+		startWebServer(*port)
+	} else {
+		startCLI()
+	}
+}
+
+func startWebServer(port string) {
+	fmt.Printf("🌐 Starting D&D Character Creator Web Server on port %s...\n", port)
+
+	// Initialize web handler
+	webHandler, err := handlers.NewWebHandler()
+	if err != nil {
+		log.Fatalf("Failed to initialize web handler: %v", err)
+	}
+
+	// Setup routes
+	http.HandleFunc("/", webHandler.HomeHandler)
+	http.HandleFunc("/characters", webHandler.CharacterListHandler)
+	http.HandleFunc("/characters/new", webHandler.CharacterCreateHandler)
+	http.HandleFunc("/characters/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/characters/" {
+			webHandler.CharacterListHandler(w, r)
+			return
+		}
+
+		// Handle character view and delete
+		if r.Method == "POST" && len(r.URL.Path) > 12 && r.URL.Path[len(r.URL.Path)-7:] == "/delete" {
+			webHandler.CharacterDeleteHandler(w, r)
+		} else {
+			webHandler.CharacterViewHandler(w, r)
+		}
+	})
+	http.HandleFunc("/api/generate-abilities", webHandler.GenerateAbilitiesHandler)
+	http.HandleFunc("/static/", handlers.StaticHandler)
+
+	fmt.Printf("🚀 Server running at http://localhost:%s\n", port)
+	fmt.Println("📝 Create characters at http://localhost:" + port + "/characters/new")
+	fmt.Println("👥 View characters at http://localhost:" + port + "/characters")
+	fmt.Println("\nPress Ctrl+C to stop the server")
+
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
+		log.Fatalf("Failed to start web server: %v", err)
+	}
+}
+
+func startCLI() {
 	// Show welcome message
 	ui.ShowWelcome()
 

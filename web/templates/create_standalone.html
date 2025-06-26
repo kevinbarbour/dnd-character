@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}} - D&D 5e Character Creator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/css/custom.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-dice-6"></i>
+                D&D 5e Character Creator
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/characters/new">
+                            <i class="bi bi-plus-circle"></i> Create Character
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/characters">
+                            <i class="bi bi-people"></i> My Characters
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">
+                            <i class="bi bi-plus-circle"></i> Create New Character
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="characterForm" method="POST" action="/characters/new">
+                            <!-- Character Name -->
+                            <div class="mb-4">
+                                <label for="name" class="form-label">
+                                    <i class="bi bi-person"></i> Character Name
+                                </label>
+                                <input type="text" class="form-control" id="name" name="name" required 
+                                       placeholder="Enter your character's name" maxlength="50">
+                            </div>
+
+                            <!-- Ability Score Generation -->
+                            <div class="mb-4">
+                                <label class="form-label">
+                                    <i class="bi bi-dice-6"></i> Ability Score Generation Method
+                                </label>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="card method-card" data-method="dice">
+                                            <div class="card-body text-center">
+                                                <i class="bi bi-dice-5 text-warning display-6"></i>
+                                                <h6 class="mt-2">Dice Roll</h6>
+                                                <small class="text-muted">4d6 drop lowest</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card method-card" data-method="pointbuy">
+                                            <div class="card-body text-center">
+                                                <i class="bi bi-calculator text-info display-6"></i>
+                                                <h6 class="mt-2">Point Buy</h6>
+                                                <small class="text-muted">27 points</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card method-card" data-method="standard">
+                                            <div class="card-body text-center">
+                                                <i class="bi bi-list-ol text-success display-6"></i>
+                                                <h6 class="mt-2">Standard Array</h6>
+                                                <small class="text-muted">15,14,13,12,10,8</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" id="generateBtn" class="btn btn-outline-primary mt-3" disabled>
+                                    <i class="bi bi-arrow-clockwise"></i> Generate Ability Scores
+                                </button>
+                            </div>
+
+                            <!-- Ability Scores -->
+                            <div class="mb-4" id="abilityScores" style="display: none;">
+                                <label class="form-label">
+                                    <i class="bi bi-bar-chart"></i> Ability Scores
+                                </label>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label for="strength" class="form-label">Strength</label>
+                                        <input type="number" class="form-control" id="strength" name="strength" 
+                                               min="3" max="18" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="dexterity" class="form-label">Dexterity</label>
+                                        <input type="number" class="form-control" id="dexterity" name="dexterity" 
+                                               min="3" max="18" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="constitution" class="form-label">Constitution</label>
+                                        <input type="number" class="form-control" id="constitution" name="constitution" 
+                                               min="3" max="18" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="intelligence" class="form-label">Intelligence</label>
+                                        <input type="number" class="form-control" id="intelligence" name="intelligence" 
+                                               min="3" max="18" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="wisdom" class="form-label">Wisdom</label>
+                                        <input type="number" class="form-control" id="wisdom" name="wisdom" 
+                                               min="3" max="18" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="charisma" class="form-label">Charisma</label>
+                                        <input type="number" class="form-control" id="charisma" name="charisma" 
+                                               min="3" max="18" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Race Selection -->
+                            <div class="mb-4">
+                                <label for="race" class="form-label">
+                                    <i class="bi bi-people"></i> Race
+                                </label>
+                                <select class="form-select" id="race" name="race" required>
+                                    <option value="">Choose a race...</option>
+                                    {{range .Races}}
+                                    <option value="{{.Name}}">{{.Name}} - {{.Description}}</option>
+                                    {{end}}
+                                </select>
+                                <div id="raceInfo" class="mt-2 text-muted small"></div>
+                            </div>
+
+                            <!-- Class Selection -->
+                            <div class="mb-4">
+                                <label for="class" class="form-label">
+                                    <i class="bi bi-shield"></i> Class
+                                </label>
+                                <select class="form-select" id="class" name="class" required>
+                                    <option value="">Choose a class...</option>
+                                    {{range .Classes}}
+                                    <option value="{{.Name}}">{{.Name}} - {{.Description}}</option>
+                                    {{end}}
+                                </select>
+                                <div id="classInfo" class="mt-2 text-muted small"></div>
+                            </div>
+
+                            <!-- Background Selection -->
+                            <div class="mb-4">
+                                <label for="background" class="form-label">
+                                    <i class="bi bi-book"></i> Background
+                                </label>
+                                <select class="form-select" id="background" name="background" required>
+                                    <option value="">Choose a background...</option>
+                                    {{range .Backgrounds}}
+                                    <option value="{{.Name}}">{{.Name}} - {{.Description}}</option>
+                                    {{end}}
+                                </select>
+                                <div id="backgroundInfo" class="mt-2 text-muted small"></div>
+                            </div>
+
+                            <!-- Character Preview -->
+                            <div class="mb-4" id="characterPreview" style="display: none;">
+                                <h5><i class="bi bi-eye"></i> Character Preview</h5>
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <div id="previewContent">
+                                            <!-- Preview will be populated by JavaScript -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="/" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn-success" id="submitBtn" disabled>
+                                    <i class="bi bi-save"></i> Create Character
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-light mt-5 py-4">
+        <div class="container text-center">
+            <p>&copy; 2025 D&D 5e Character Creator. Built with Go and Bootstrap.</p>
+            <p class="small text-muted">
+                Dungeons & Dragons content is owned by Wizards of the Coast.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/app.js"></script>
+    
+    <script>
+    // Store data for JavaScript access
+    window.raceData = {};
+    window.classData = {};
+    window.backgroundData = {};
+
+    {{range .Races}}
+    window.raceData["{{.Name}}"] = {
+        "name": "{{.Name}}",
+        "description": "{{.Description}}",
+        "size": "{{.Size}}",
+        "speed": {{.Speed}},
+        "traits": [{{range $i, $trait := .Traits}}{{if $i}}, {{end}}"{{$trait}}"{{end}}],
+        "bonuses": {
+            "strength": {{.StrengthBonus}},
+            "dexterity": {{.DexterityBonus}},
+            "constitution": {{.ConstitutionBonus}},
+            "intelligence": {{.IntelligenceBonus}},
+            "wisdom": {{.WisdomBonus}},
+            "charisma": {{.CharismaBonus}}
+        }
+    };
+    {{end}}
+
+    {{range .Classes}}
+    window.classData["{{.Name}}"] = {
+        "name": "{{.Name}}",
+        "description": "{{.Description}}",
+        "hitDie": {{.HitDie}},
+        "primaryAbility": "{{.PrimaryAbility}}",
+        "savingThrows": [{{range $i, $save := .SavingThrows}}{{if $i}}, {{end}}"{{$save}}"{{end}}]
+    };
+    {{end}}
+
+    {{range .Backgrounds}}
+    window.backgroundData["{{.Name}}"] = {
+        "name": "{{.Name}}",
+        "description": "{{.Description}}",
+        "skills": [{{range $i, $skill := .Skills}}{{if $i}}, {{end}}"{{$skill}}"{{end}}],
+        "feature": "{{.Feature}}"
+    };
+    {{end}}
+    </script>
+</body>
+</html>
