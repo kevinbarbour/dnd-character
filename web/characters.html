@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Characters - D&D 5e Character Creator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎲</text></svg>">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">🎲 D&D Character Creator</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="index.html">Home</a>
+                    <a class="nav-link active" href="characters.html">My Characters</a>
+                    <a class="nav-link" href="create.html">Create Character</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>🗡️ My Characters</h2>
+                    <div>
+                        <a href="create.html" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Create New Character
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text">🔍</span>
+                            <input type="text" class="form-control" id="search-input" placeholder="Search characters...">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <select class="form-select" id="filter-race">
+                                    <option value="">All Races</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" id="filter-class">
+                                    <option value="">All Classes</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" id="filter-background">
+                                    <option value="">All Backgrounds</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Character Stats -->
+                <div class="row mb-4" id="character-stats">
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary" id="total-characters">0</h5>
+                                <p class="card-text">Total Characters</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title text-success" id="spellcasters">0</h5>
+                                <p class="card-text">Spellcasters</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title text-warning" id="average-level">1.0</h5>
+                                <p class="card-text">Average Level</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title text-info" id="storage-used">0 B</h5>
+                                <p class="card-text">Storage Used</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Characters List -->
+                <div id="characters-container">
+                    <!-- Characters will be loaded here -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="text-center py-5" style="display: none;">
+                    <div class="mb-4">
+                        <i class="fas fa-users fa-5x text-muted"></i>
+                    </div>
+                    <h3 class="text-muted">No Characters Yet</h3>
+                    <p class="text-muted mb-4">Create your first D&D character to get started!</p>
+                    <a href="create.html" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus"></i> Create Your First Character
+                    </a>
+                </div>
+
+                <!-- No Results State -->
+                <div id="no-results" class="text-center py-5" style="display: none;">
+                    <div class="mb-4">
+                        <i class="fas fa-search fa-3x text-muted"></i>
+                    </div>
+                    <h4 class="text-muted">No Characters Found</h4>
+                    <p class="text-muted">Try adjusting your search or filters.</p>
+                    <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
+                </div>
+
+                <!-- Bulk Actions -->
+                <div class="mt-5 pt-4 border-top">
+                    <h5>Bulk Actions</h5>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary" onclick="exportAllCharacters()">
+                            <i class="fas fa-download"></i> Export All Characters
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('import-file').click()">
+                            <i class="fas fa-upload"></i> Import Characters
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" onclick="clearAllDataConfirm()">
+                            <i class="fas fa-trash"></i> Clear All Data
+                        </button>
+                    </div>
+                    <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importCharacters(event)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-light mt-5 py-4">
+        <div class="container text-center">
+            <p>&copy; 2024 D&D Character Creator. Built with ❤️ for adventurers everywhere!</p>
+            <p><small>Dungeons & Dragons content is owned by Wizards of the Coast. This is a fan-made tool.</small></p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- App Scripts -->
+    <script src="js/data/races.js"></script>
+    <script src="js/data/classes.js"></script>
+    <script src="js/data/backgrounds.js"></script>
+    <script src="js/data/spells.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/app.js"></script>
+    
+    <script>
+        let allCharacters = [];
+        let filteredCharacters = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFilters();
+            loadCharactersList();
+            setupEventListeners();
+        });
+
+        function initializeFilters() {
+            // Populate race filter
+            const raceFilter = document.getElementById('filter-race');
+            RACES.forEach(race => {
+                const option = document.createElement('option');
+                option.value = race.name;
+                option.textContent = race.name;
+                raceFilter.appendChild(option);
+            });
+
+            // Populate class filter
+            const classFilter = document.getElementById('filter-class');
+            CLASSES.forEach(cls => {
+                const option = document.createElement('option');
+                option.value = cls.name;
+                option.textContent = cls.name;
+                classFilter.appendChild(option);
+            });
+
+            // Populate background filter
+            const backgroundFilter = document.getElementById('filter-background');
+            BACKGROUNDS.forEach(bg => {
+                const option = document.createElement('option');
+                option.value = bg.name;
+                option.textContent = bg.name;
+                backgroundFilter.appendChild(option);
+            });
+        }
+
+        function setupEventListeners() {
+            // Search input
+            document.getElementById('search-input').addEventListener('input', filterCharacters);
+            
+            // Filter dropdowns
+            document.getElementById('filter-race').addEventListener('change', filterCharacters);
+            document.getElementById('filter-class').addEventListener('change', filterCharacters);
+            document.getElementById('filter-background').addEventListener('change', filterCharacters);
+        }
+
+        function loadCharactersList() {
+            allCharacters = getCharacters();
+            filteredCharacters = [...allCharacters];
+            
+            updateCharacterStats();
+            renderCharacters();
+        }
+
+        function updateCharacterStats() {
+            const stats = getCharacterStats();
+            const storageInfo = getStorageInfo();
+            
+            document.getElementById('total-characters').textContent = stats.total;
+            
+            // Count spellcasters
+            const spellcasterCount = allCharacters.filter(char => isSpellcaster(char.class)).length;
+            document.getElementById('spellcasters').textContent = spellcasterCount;
+            
+            document.getElementById('average-level').textContent = stats.averageLevel;
+            document.getElementById('storage-used').textContent = storageInfo.storageUsedFormatted;
+        }
+
+        function filterCharacters() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const raceFilter = document.getElementById('filter-race').value;
+            const classFilter = document.getElementById('filter-class').value;
+            const backgroundFilter = document.getElementById('filter-background').value;
+
+            filteredCharacters = allCharacters.filter(character => {
+                // Search filter
+                const matchesSearch = !searchTerm || 
+                    character.name.toLowerCase().includes(searchTerm) ||
+                    character.race.toLowerCase().includes(searchTerm) ||
+                    character.class.toLowerCase().includes(searchTerm) ||
+                    character.background.toLowerCase().includes(searchTerm);
+
+                // Race filter
+                const matchesRace = !raceFilter || character.race === raceFilter;
+                
+                // Class filter
+                const matchesClass = !classFilter || character.class === classFilter;
+                
+                // Background filter
+                const matchesBackground = !backgroundFilter || character.background === backgroundFilter;
+
+                return matchesSearch && matchesRace && matchesClass && matchesBackground;
+            });
+
+            renderCharacters();
+        }
+
+        function renderCharacters() {
+            const container = document.getElementById('characters-container');
+            const emptyState = document.getElementById('empty-state');
+            const noResults = document.getElementById('no-results');
+
+            // Hide all states initially
+            emptyState.style.display = 'none';
+            noResults.style.display = 'none';
+
+            if (allCharacters.length === 0) {
+                // No characters at all
+                container.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            if (filteredCharacters.length === 0) {
+                // No characters match filters
+                container.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            // Render filtered characters
+            container.innerHTML = filteredCharacters
+                .map(character => renderCharacterCard(character))
+                .join('');
+        }
+
+        function clearFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('filter-race').value = '';
+            document.getElementById('filter-class').value = '';
+            document.getElementById('filter-background').value = '';
+            filterCharacters();
+        }
+
+        function exportAllCharacters() {
+            const characters = getCharacters();
+            if (characters.length === 0) {
+                showAlert('No characters to export!', 'warning');
+                return;
+            }
+            
+            const dataStr = JSON.stringify(characters, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `dnd-characters-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            showAlert(`Exported ${characters.length} characters successfully!`, 'success');
+        }
+
+        function importCharacters(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    let importedCharacters = [];
+                    
+                    // Handle both single character and array formats
+                    if (Array.isArray(importedData)) {
+                        importedCharacters = importedData;
+                    } else if (importedData.characters && Array.isArray(importedData.characters)) {
+                        // Backup format
+                        importedCharacters = importedData.characters;
+                    } else if (importedData.name) {
+                        // Single character
+                        importedCharacters = [importedData];
+                    } else {
+                        throw new Error('Invalid file format');
+                    }
+                    
+                    // Import characters
+                    let successCount = 0;
+                    importedCharacters.forEach(charData => {
+                        try {
+                            // Remove ID to generate new one
+                            delete charData.id;
+                            saveCharacter(charData);
+                            successCount++;
+                        } catch (error) {
+                            console.error('Failed to import character:', charData.name, error);
+                        }
+                    });
+                    
+                    if (successCount > 0) {
+                        showAlert(`Successfully imported ${successCount} characters!`, 'success');
+                        loadCharactersList(); // Refresh the list
+                    } else {
+                        showAlert('No characters could be imported. Please check the file format.', 'warning');
+                    }
+                    
+                } catch (error) {
+                    showAlert('Error reading file. Please make sure it\'s a valid JSON file.', 'danger');
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset file input
+            event.target.value = '';
+        }
+
+        function clearAllDataConfirm() {
+            if (allCharacters.length === 0) {
+                showAlert('No characters to delete!', 'warning');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete ALL ${allCharacters.length} characters? This cannot be undone!`)) {
+                if (confirm('This will permanently delete all your characters. Are you absolutely sure?')) {
+                    try {
+                        clearAllCharacters();
+                        showAlert('All character data has been cleared.', 'success');
+                        loadCharactersList(); // Refresh the list
+                    } catch (error) {
+                        showAlert('Failed to clear character data: ' + error.message, 'danger');
+                    }
+                }
+            }
+        }
+
+        // Override the global function to refresh this page
+        window.deleteCharacterConfirm = function(id) {
+            const character = getCharacter(id);
+            if (!character) {
+                showAlert('Character not found', 'danger');
+                return;
+            }
+
+            if (confirm(`Are you sure you want to delete "${character.name}"? This cannot be undone.`)) {
+                try {
+                    deleteCharacter(id);
+                    showAlert(`Character "${character.name}" deleted successfully`, 'success');
+                    loadCharactersList(); // Refresh the list
+                } catch (error) {
+                    showAlert('Failed to delete character: ' + error.message, 'danger');
+                }
+            }
+        };
+
+        // Override the global export function
+        window.exportCharacter = function(id) {
+            try {
+                const character = getCharacter(id);
+                if (!character) {
+                    showAlert('Character not found', 'danger');
+                    return;
+                }
+                
+                const dataStr = JSON.stringify(character, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                link.download = `${character.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}-character.json`;
+                link.click();
+                
+                showAlert(`Character "${character.name}" exported successfully!`, 'success');
+            } catch (error) {
+                showAlert('Failed to export character: ' + error.message, 'danger');
+            }
+        };
+    </script>
+</body>
+</html>

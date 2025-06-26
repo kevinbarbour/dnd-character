@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Sheet - D&D 5e Character Creator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎲</text></svg>">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">🎲 D&D Character Creator</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="index.html">Home</a>
+                    <a class="nav-link" href="characters.html">My Characters</a>
+                    <a class="nav-link" href="create.html">Create Character</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <!-- Character Not Found -->
+                <div id="character-not-found" class="text-center py-5" style="display: none;">
+                    <div class="mb-4">
+                        <i class="fas fa-exclamation-triangle fa-5x text-warning"></i>
+                    </div>
+                    <h3 class="text-muted">Character Not Found</h3>
+                    <p class="text-muted mb-4">The character you're looking for doesn't exist or may have been deleted.</p>
+                    <a href="characters.html" class="btn btn-primary">
+                        <i class="fas fa-arrow-left"></i> Back to Characters
+                    </a>
+                </div>
+
+                <!-- Character Sheet -->
+                <div id="character-sheet" style="display: none;">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h1 id="character-name">Character Name</h1>
+                            <p class="lead mb-0" id="character-subtitle">Level 1 Race Class</p>
+                            <p class="text-muted" id="character-background">Background</p>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-outline-secondary" onclick="exportCurrentCharacter()">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                            <button class="btn btn-outline-danger" onclick="deleteCurrentCharacter()">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                            <a href="characters.html" class="btn btn-primary">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Main Stats -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">💪 Ability Scores</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row" id="ability-scores">
+                                        <!-- Ability scores will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">⚔️ Combat Stats</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row text-center">
+                                        <div class="col-6">
+                                            <div class="stat-display">
+                                                <div class="stat-value" id="hit-points">8</div>
+                                                <div class="stat-label">Hit Points</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="stat-display">
+                                                <div class="stat-value" id="armor-class">10</div>
+                                                <div class="stat-label">Armor Class</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 mt-3">
+                                            <div class="stat-display">
+                                                <div class="stat-value">+2</div>
+                                                <div class="stat-label">Proficiency Bonus</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 mt-3">
+                                            <div class="stat-display">
+                                                <div class="stat-value" id="initiative">+0</div>
+                                                <div class="stat-label">Initiative</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">🎯 Proficiencies</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <strong>Saving Throws:</strong>
+                                        <div id="saving-throws" class="mt-1"></div>
+                                    </div>
+                                    <div>
+                                        <strong>Skills:</strong>
+                                        <div id="skills" class="mt-1"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Spells Section (for spellcasters) -->
+                    <div id="spells-section" style="display: none;">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">✨ Spells</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="spell-info" class="mb-3"></div>
+                                
+                                <!-- Cantrips -->
+                                <div id="cantrips-section" class="mb-4">
+                                    <h6 class="text-primary">🔮 Cantrips</h6>
+                                    <div id="cantrips-list" class="spell-list"></div>
+                                </div>
+                                
+                                <!-- 1st Level Spells -->
+                                <div id="first-level-section">
+                                    <h6 class="text-primary">⭐ 1st Level Spells</h6>
+                                    <div id="first-level-list" class="spell-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Features & Traits -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">🏰 Racial Traits</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="racial-traits"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">⚔️ Class Features</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="class-features"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Equipment -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">🎒 Equipment</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="equipment-list"></div>
+                        </div>
+                    </div>
+
+                    <!-- Character Notes -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">📝 Character Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Created:</strong> <span id="created-date"></span></p>
+                                    <p><strong>Last Updated:</strong> <span id="updated-date"></span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Character ID:</strong> <span id="character-id"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-light mt-5 py-4">
+        <div class="container text-center">
+            <p>&copy; 2024 D&D Character Creator. Built with ❤️ for adventurers everywhere!</p>
+            <p><small>Dungeons & Dragons content is owned by Wizards of the Coast. This is a fan-made tool.</small></p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- App Scripts -->
+    <script src="js/data/races.js"></script>
+    <script src="js/data/classes.js"></script>
+    <script src="js/data/backgrounds.js"></script>
+    <script src="js/data/spells.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/app.js"></script>
+    
+    <script>
+        let currentCharacter = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCharacter();
+        });
+
+        function loadCharacter() {
+            // Get character ID from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const characterId = urlParams.get('id');
+
+            if (!characterId) {
+                showCharacterNotFound();
+                return;
+            }
+
+            // Load character from storage
+            currentCharacter = getCharacter(parseFloat(characterId));
+            
+            if (!currentCharacter) {
+                showCharacterNotFound();
+                return;
+            }
+
+            displayCharacter(currentCharacter);
+        }
+
+        function showCharacterNotFound() {
+            document.getElementById('character-not-found').style.display = 'block';
+            document.getElementById('character-sheet').style.display = 'none';
+        }
+
+        function displayCharacter(character) {
+            document.getElementById('character-not-found').style.display = 'none';
+            document.getElementById('character-sheet').style.display = 'block';
+
+            // Basic info
+            document.getElementById('character-name').textContent = character.name;
+            document.getElementById('character-subtitle').textContent = 
+                `Level ${character.level} ${character.race} ${character.class}`;
+            document.getElementById('character-background').textContent = character.background;
+
+            // Ability scores
+            displayAbilityScores(character.abilities);
+
+            // Combat stats
+            document.getElementById('hit-points').textContent = character.hitPoints;
+            document.getElementById('armor-class').textContent = character.armorClass;
+            document.getElementById('initiative').textContent = 
+                formatModifier(getAbilityModifier(character.abilities.dexterity));
+
+            // Proficiencies
+            displayProficiencies(character);
+
+            // Spells (if applicable)
+            if (isSpellcaster(character.class) && character.spells && character.spells.length > 0) {
+                displaySpells(character);
+            }
+
+            // Features and traits
+            displayRacialTraits(character.race);
+            displayClassFeatures(character.class);
+
+            // Equipment
+            displayEquipment(character.equipment || []);
+
+            // Character info
+            document.getElementById('created-date').textContent = formatDate(character.created);
+            document.getElementById('updated-date').textContent = formatDate(character.updated);
+            document.getElementById('character-id').textContent = character.id;
+        }
+
+        function displayAbilityScores(abilities) {
+            const container = document.getElementById('ability-scores');
+            const abilityNames = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
+            
+            container.innerHTML = abilityNames.map(ability => {
+                const score = abilities[ability];
+                const modifier = getAbilityModifier(score);
+                const shortName = ability.substring(0, 3).toUpperCase();
+                
+                return `
+                    <div class="col-6 mb-2">
+                        <div class="ability-display text-center">
+                            <div class="ability-name">${shortName}</div>
+                            <div class="ability-score">${score}</div>
+                            <div class="ability-mod">${formatModifier(modifier)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function displayProficiencies(character) {
+            // Saving throws
+            const saves = getSavingThrowProficiencies(character.class);
+            document.getElementById('saving-throws').innerHTML = saves
+                .map(save => `<span class="badge bg-primary me-1">${save}</span>`)
+                .join('');
+
+            // Skills (from background)
+            const skills = getBackgroundSkills(character.background);
+            document.getElementById('skills').innerHTML = skills
+                .map(skill => `<span class="badge bg-secondary me-1">${skill}</span>`)
+                .join('');
+        }
+
+        function displaySpells(character) {
+            document.getElementById('spells-section').style.display = 'block';
+            
+            const spellcastingInfo = getSpellcastingInfo(character.class);
+            document.getElementById('spell-info').innerHTML = `
+                <div class="alert alert-info">
+                    <strong>Spellcasting Ability:</strong> ${spellcastingInfo.ability}<br>
+                    <strong>Spell Save DC:</strong> 8 + proficiency bonus + ${spellcastingInfo.ability} modifier<br>
+                    <strong>Spell Attack Bonus:</strong> proficiency bonus + ${spellcastingInfo.ability} modifier
+                </div>
+            `;
+
+            // Separate cantrips and spells
+            const classSpells = getSpellsForClass(character.class);
+            const cantrips = character.spells.filter(spellName => 
+                classSpells.cantrips.some(c => c.name === spellName)
+            );
+            const firstLevelSpells = character.spells.filter(spellName => 
+                classSpells.firstLevel.some(s => s.name === spellName)
+            );
+
+            // Display cantrips
+            if (cantrips.length > 0) {
+                document.getElementById('cantrips-list').innerHTML = cantrips
+                    .map(spellName => {
+                        const spell = getSpellByName(spellName, character.class);
+                        return createSpellDisplay(spell);
+                    }).join('');
+            } else {
+                document.getElementById('cantrips-section').style.display = 'none';
+            }
+
+            // Display first level spells
+            if (firstLevelSpells.length > 0) {
+                document.getElementById('first-level-list').innerHTML = firstLevelSpells
+                    .map(spellName => {
+                        const spell = getSpellByName(spellName, character.class);
+                        return createSpellDisplay(spell);
+                    }).join('');
+            } else {
+                document.getElementById('first-level-section').style.display = 'none';
+            }
+        }
+
+        function createSpellDisplay(spell) {
+            if (!spell) return '';
+            
+            return `
+                <div class="spell-display mb-2">
+                    <div class="spell-name-display">
+                        <strong>${spell.name}</strong>
+                        <span class="spell-school-display">${spell.school}</span>
+                    </div>
+                    <div class="spell-description-display">${spell.description}</div>
+                </div>
+            `;
+        }
+
+        function displayRacialTraits(raceName) {
+            const race = getRaceByName(raceName);
+            if (race && race.traits) {
+                document.getElementById('racial-traits').innerHTML = race.traits
+                    .map(trait => `<div class="feature-item"><strong>${trait}</strong></div>`)
+                    .join('');
+            }
+        }
+
+        function displayClassFeatures(className) {
+            const cls = getClassByName(className);
+            if (cls && cls.features) {
+                document.getElementById('class-features').innerHTML = cls.features
+                    .map(feature => `<div class="feature-item"><strong>${feature}</strong></div>`)
+                    .join('');
+            }
+        }
+
+        function displayEquipment(equipment) {
+            if (equipment.length > 0) {
+                document.getElementById('equipment-list').innerHTML = equipment
+                    .map(item => `<div class="equipment-item">• ${item}</div>`)
+                    .join('');
+            } else {
+                document.getElementById('equipment-list').innerHTML = 
+                    '<p class="text-muted">No equipment listed.</p>';
+            }
+        }
+
+        function exportCurrentCharacter() {
+            if (!currentCharacter) return;
+            
+            try {
+                const dataStr = JSON.stringify(currentCharacter, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                link.download = `${currentCharacter.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}-character.json`;
+                link.click();
+                
+                showAlert(`Character "${currentCharacter.name}" exported successfully!`, 'success');
+            } catch (error) {
+                showAlert('Failed to export character: ' + error.message, 'danger');
+            }
+        }
+
+        function deleteCurrentCharacter() {
+            if (!currentCharacter) return;
+            
+            if (confirm(`Are you sure you want to delete "${currentCharacter.name}"? This cannot be undone.`)) {
+                try {
+                    deleteCharacter(currentCharacter.id);
+                    showAlert(`Character "${currentCharacter.name}" deleted successfully`, 'success');
+                    
+                    // Redirect to characters list
+                    setTimeout(() => {
+                        window.location.href = 'characters.html';
+                    }, 2000);
+                } catch (error) {
+                    showAlert('Failed to delete character: ' + error.message, 'danger');
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .ability-display {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 0.5rem;
+        }
+
+        .ability-name {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .ability-score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .ability-mod {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .stat-display {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .spell-display {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .spell-name-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .spell-school-display {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .spell-description-display {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .feature-item {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-left: 3px solid var(--secondary-color);
+        }
+
+        .equipment-item {
+            padding: 0.25rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .equipment-item:last-child {
+            border-bottom: none;
+        }
+
+        @media print {
+            .navbar, footer, .btn-group {
+                display: none !important;
+            }
+            
+            .card {
+                break-inside: avoid;
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+            }
+        }
+    </style>
+</body>
+</html>

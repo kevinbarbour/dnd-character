@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Character - D&D 5e Character Creator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎲</text></svg>">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">🎲 D&D Character Creator</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="index.html">Home</a>
+                    <a class="nav-link" href="characters.html">My Characters</a>
+                    <a class="nav-link active" href="create.html">Create Character</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="character-form">
+                    <h2 class="text-center mb-4">🗡️ Create New Character ✨</h2>
+                    
+                    <form id="character-form">
+                        <!-- Basic Information -->
+                        <div class="form-section">
+                            <h4>📝 Basic Information</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="character-name" class="form-label">Character Name *</label>
+                                    <input type="text" class="form-control" id="character-name" name="name" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="character-level" class="form-label">Level</label>
+                                    <input type="number" class="form-control" id="character-level" name="level" value="1" min="1" max="20" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Race Selection -->
+                        <div class="form-section">
+                            <h4>🏰 Race</h4>
+                            <select class="form-select" id="character-race" name="race" required>
+                                <option value="">Select a race...</option>
+                            </select>
+                            <div id="race-description" class="mt-2 text-muted"></div>
+                        </div>
+
+                        <!-- Class Selection -->
+                        <div class="form-section">
+                            <h4>⚔️ Class</h4>
+                            <select class="form-select" id="character-class" name="class" required>
+                                <option value="">Select a class...</option>
+                            </select>
+                            <div id="class-description" class="mt-2 text-muted"></div>
+                        </div>
+
+                        <!-- Background Selection -->
+                        <div class="form-section">
+                            <h4>📚 Background</h4>
+                            <select class="form-select" id="character-background" name="background" required>
+                                <option value="">Select a background...</option>
+                            </select>
+                            <div id="background-description" class="mt-2 text-muted"></div>
+                        </div>
+
+                        <!-- Ability Scores -->
+                        <div class="form-section">
+                            <h4>🎲 Ability Scores</h4>
+                            <div class="mb-3">
+                                <label class="form-label">Generation Method</label>
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" name="ability-method" id="method-dice" value="dice" checked>
+                                    <label class="btn btn-outline-primary" for="method-dice">🎲 Dice Roll</label>
+                                    
+                                    <input type="radio" class="btn-check" name="ability-method" id="method-standard" value="standard">
+                                    <label class="btn btn-outline-primary" for="method-standard">📊 Standard Array</label>
+                                    
+                                    <input type="radio" class="btn-check" name="ability-method" id="method-pointbuy" value="pointbuy">
+                                    <label class="btn btn-outline-primary" for="method-pointbuy">🎯 Point Buy</label>
+                                </div>
+                            </div>
+                            
+                            <button type="button" class="btn btn-secondary mb-3" id="generate-abilities">
+                                🎲 Generate Ability Scores
+                            </button>
+                            
+                            <div class="ability-scores">
+                                <div class="ability-score">
+                                    <label for="strength">Strength</label>
+                                    <input type="number" id="strength" name="strength" min="3" max="20" value="10" required>
+                                    <div class="ability-modifier" id="str-modifier">+0</div>
+                                </div>
+                                <div class="ability-score">
+                                    <label for="dexterity">Dexterity</label>
+                                    <input type="number" id="dexterity" name="dexterity" min="3" max="20" value="10" required>
+                                    <div class="ability-modifier" id="dex-modifier">+0</div>
+                                </div>
+                                <div class="ability-score">
+                                    <label for="constitution">Constitution</label>
+                                    <input type="number" id="constitution" name="constitution" min="3" max="20" value="10" required>
+                                    <div class="ability-modifier" id="con-modifier">+0</div>
+                                </div>
+                                <div class="ability-score">
+                                    <label for="intelligence">Intelligence</label>
+                                    <input type="number" id="intelligence" name="intelligence" min="3" max="20" value="10" required>
+                                    <div class="ability-modifier" id="int-modifier">+0</div>
+                                </div>
+                                <div class="ability-score">
+                                    <label for="wisdom">Wisdom</label>
+                                    <input type="number" id="wisdom" name="wisdom" min="3" max="20" value="10" required>
+                                    <div class="ability-modifier" id="wis-modifier">+0</div>
+                                </div>
+                                <div class="ability-score">
+                                    <label for="charisma">Charisma</label>
+                                    <input type="number" id="charisma" name="charisma" min="3" max="20" value="10" required>
+                                    <div class="ability-modifier" id="cha-modifier">+0</div>
+                                </div>
+                            </div>
+                            
+                            <div id="racial-bonuses" class="mt-3" style="display: none;">
+                                <h6>Racial Bonuses Applied:</h6>
+                                <div id="racial-bonuses-list"></div>
+                            </div>
+                        </div>
+
+                        <!-- Spell Selection (for spellcasters) -->
+                        <div class="form-section" id="spell-section" style="display: none;">
+                            <h4>✨ Spell Selection</h4>
+                            <div id="spell-limits" class="mb-3"></div>
+                            
+                            <!-- Cantrips -->
+                            <div class="spell-category" id="cantrips-section">
+                                <h5>🔮 Cantrips</h5>
+                                <div class="spell-grid" id="cantrips-grid"></div>
+                            </div>
+                            
+                            <!-- 1st Level Spells -->
+                            <div class="spell-category" id="spells-section">
+                                <h5>⭐ 1st Level Spells</h5>
+                                <div class="spell-grid" id="spells-grid"></div>
+                            </div>
+                        </div>
+
+                        <!-- Character Summary -->
+                        <div class="form-section" id="character-summary" style="display: none;">
+                            <h4>📋 Character Summary</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="summary-item">
+                                        <strong>Hit Points:</strong> <span id="summary-hp">8</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <strong>Armor Class:</strong> <span id="summary-ac">10</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <strong>Proficiency Bonus:</strong> +2
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="summary-item">
+                                        <strong>Saving Throws:</strong> <span id="summary-saves"></span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <strong>Skills:</strong> <span id="summary-skills"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="text-center mt-4">
+                            <button type="button" class="btn btn-secondary me-3" onclick="window.location.href='index.html'">
+                                ❌ Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                💾 Save Character
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-light mt-5 py-4">
+        <div class="container text-center">
+            <p>&copy; 2024 D&D Character Creator. Built with ❤️ for adventurers everywhere!</p>
+            <p><small>Dungeons & Dragons content is owned by Wizards of the Coast. This is a fan-made tool.</small></p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- App Scripts -->
+    <script src="js/data/races.js"></script>
+    <script src="js/data/classes.js"></script>
+    <script src="js/data/backgrounds.js"></script>
+    <script src="js/data/spells.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/app.js"></script>
+    
+    <script>
+        // Character creation page logic
+        let selectedSpells = [];
+        let currentClass = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeForm();
+            setupEventListeners();
+        });
+
+        function initializeForm() {
+            // Populate race dropdown
+            const raceSelect = document.getElementById('character-race');
+            RACES.forEach(race => {
+                const option = document.createElement('option');
+                option.value = race.name;
+                option.textContent = race.name;
+                raceSelect.appendChild(option);
+            });
+
+            // Populate class dropdown
+            const classSelect = document.getElementById('character-class');
+            CLASSES.forEach(cls => {
+                const option = document.createElement('option');
+                option.value = cls.name;
+                option.textContent = cls.name;
+                classSelect.appendChild(option);
+            });
+
+            // Populate background dropdown
+            const backgroundSelect = document.getElementById('character-background');
+            BACKGROUNDS.forEach(bg => {
+                const option = document.createElement('option');
+                option.value = bg.name;
+                option.textContent = bg.name;
+                backgroundSelect.appendChild(option);
+            });
+
+            updateAbilityModifiers();
+        }
+
+        function setupEventListeners() {
+            // Race selection
+            document.getElementById('character-race').addEventListener('change', function() {
+                const race = getRaceByName(this.value);
+                if (race) {
+                    document.getElementById('race-description').textContent = race.description;
+                    updateRacialBonuses();
+                    updateCharacterSummary();
+                }
+            });
+
+            // Class selection
+            document.getElementById('character-class').addEventListener('change', function() {
+                const cls = getClassByName(this.value);
+                if (cls) {
+                    document.getElementById('class-description').textContent = cls.description;
+                    currentClass = this.value;
+                    updateSpellSection();
+                    updateCharacterSummary();
+                }
+            });
+
+            // Background selection
+            document.getElementById('character-background').addEventListener('change', function() {
+                const bg = getBackgroundByName(this.value);
+                if (bg) {
+                    document.getElementById('background-description').textContent = bg.description;
+                    updateCharacterSummary();
+                }
+            });
+
+            // Ability score changes
+            ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'].forEach(ability => {
+                document.getElementById(ability).addEventListener('input', function() {
+                    updateAbilityModifiers();
+                    updateCharacterSummary();
+                });
+            });
+
+            // Generate abilities button
+            document.getElementById('generate-abilities').addEventListener('click', generateAbilities);
+
+            // Form submission
+            document.getElementById('character-form').addEventListener('submit', handleFormSubmit);
+        }
+
+        function generateAbilities() {
+            const method = document.querySelector('input[name="ability-method"]:checked').value;
+            const abilities = generateAbilityScores(method);
+            
+            Object.keys(abilities).forEach(ability => {
+                document.getElementById(ability).value = abilities[ability];
+            });
+            
+            updateAbilityModifiers();
+            updateRacialBonuses();
+            updateCharacterSummary();
+        }
+
+        function updateAbilityModifiers() {
+            ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'].forEach(ability => {
+                const score = parseInt(document.getElementById(ability).value) || 10;
+                const modifier = getAbilityModifier(score);
+                const shortName = ability.substring(0, 3);
+                document.getElementById(`${shortName}-modifier`).textContent = formatModifier(modifier);
+            });
+        }
+
+        function updateRacialBonuses() {
+            const raceName = document.getElementById('character-race').value;
+            if (!raceName) return;
+
+            const bonuses = getRaceAbilityBonus(raceName);
+            const bonusesDiv = document.getElementById('racial-bonuses');
+            const bonusesList = document.getElementById('racial-bonuses-list');
+            
+            if (Object.keys(bonuses).length > 0) {
+                bonusesDiv.style.display = 'block';
+                bonusesList.innerHTML = Object.entries(bonuses)
+                    .map(([ability, bonus]) => `<span class="badge bg-success me-1">${ability.charAt(0).toUpperCase() + ability.slice(1)} +${bonus}</span>`)
+                    .join('');
+            } else {
+                bonusesDiv.style.display = 'none';
+            }
+        }
+
+        function updateSpellSection() {
+            const spellSection = document.getElementById('spell-section');
+            
+            if (!currentClass || !isSpellcaster(currentClass)) {
+                spellSection.style.display = 'none';
+                return;
+            }
+
+            spellSection.style.display = 'block';
+            const spellcastingInfo = getSpellcastingInfo(currentClass);
+            
+            // Update spell limits
+            document.getElementById('spell-limits').innerHTML = `
+                <div class="alert alert-info">
+                    <strong>${currentClass} Spellcasting:</strong> 
+                    Select up to ${spellcastingInfo.cantripsKnown} cantrips and ${spellcastingInfo.spellsKnown} 1st level spells.
+                </div>
+            `;
+
+            // Load spells for this class
+            const classSpells = getSpellsForClass(currentClass);
+            loadSpellGrid('cantrips-grid', classSpells.cantrips, 'cantrip');
+            loadSpellGrid('spells-grid', classSpells.firstLevel, 'spell');
+        }
+
+        function loadSpellGrid(gridId, spells, type) {
+            const grid = document.getElementById(gridId);
+            grid.innerHTML = '';
+
+            spells.forEach(spell => {
+                const spellCard = document.createElement('div');
+                spellCard.className = 'spell-card';
+                spellCard.dataset.spellName = spell.name;
+                spellCard.dataset.spellType = type;
+                
+                spellCard.innerHTML = `
+                    <div class="spell-name">${spell.name}</div>
+                    <div class="spell-school">${spell.school}</div>
+                    <div class="spell-description">${spell.description}</div>
+                `;
+
+                spellCard.addEventListener('click', () => toggleSpell(spell.name, type, spellCard));
+                grid.appendChild(spellCard);
+            });
+        }
+
+        function toggleSpell(spellName, type, cardElement) {
+            const spellcastingInfo = getSpellcastingInfo(currentClass);
+            const isSelected = selectedSpells.includes(spellName);
+
+            if (isSelected) {
+                // Remove spell
+                selectedSpells = selectedSpells.filter(s => s !== spellName);
+                cardElement.classList.remove('selected');
+            } else {
+                // Check limits
+                const selectedCantrips = selectedSpells.filter(s => {
+                    const spellData = getSpellByName(s, currentClass);
+                    return spellData && getSpellsForClass(currentClass).cantrips.some(c => c.name === s);
+                });
+                
+                const selectedFirstLevel = selectedSpells.filter(s => {
+                    const spellData = getSpellByName(s, currentClass);
+                    return spellData && getSpellsForClass(currentClass).firstLevel.some(c => c.name === s);
+                });
+
+                if (type === 'cantrip' && selectedCantrips.length >= spellcastingInfo.cantripsKnown) {
+                    showAlert(`You can only select ${spellcastingInfo.cantripsKnown} cantrips`, 'warning');
+                    return;
+                }
+
+                if (type === 'spell' && selectedFirstLevel.length >= spellcastingInfo.spellsKnown) {
+                    showAlert(`You can only select ${spellcastingInfo.spellsKnown} first level spells`, 'warning');
+                    return;
+                }
+
+                // Add spell
+                selectedSpells.push(spellName);
+                cardElement.classList.add('selected');
+            }
+        }
+
+        function updateCharacterSummary() {
+            const name = document.getElementById('character-name').value;
+            const race = document.getElementById('character-race').value;
+            const cls = document.getElementById('character-class').value;
+            const background = document.getElementById('character-background').value;
+
+            if (name && race && cls && background) {
+                document.getElementById('character-summary').style.display = 'block';
+
+                // Calculate HP
+                const constitution = parseInt(document.getElementById('constitution').value) || 10;
+                const hp = calculateHitPoints(cls, constitution);
+                document.getElementById('summary-hp').textContent = hp;
+
+                // Calculate AC
+                const dexterity = parseInt(document.getElementById('dexterity').value) || 10;
+                const ac = calculateArmorClass(dexterity);
+                document.getElementById('summary-ac').textContent = ac;
+
+                // Saving throws
+                const saves = getSavingThrowProficiencies(cls);
+                document.getElementById('summary-saves').textContent = saves.join(', ');
+
+                // Skills (simplified)
+                const bgSkills = getBackgroundSkills(background);
+                document.getElementById('summary-skills').textContent = bgSkills.join(', ');
+            }
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const characterData = {
+                name: formData.get('name'),
+                race: formData.get('race'),
+                class: formData.get('class'),
+                background: formData.get('background'),
+                abilities: {
+                    strength: parseInt(formData.get('strength')),
+                    dexterity: parseInt(formData.get('dexterity')),
+                    constitution: parseInt(formData.get('constitution')),
+                    intelligence: parseInt(formData.get('intelligence')),
+                    wisdom: parseInt(formData.get('wisdom')),
+                    charisma: parseInt(formData.get('charisma'))
+                },
+                spells: selectedSpells
+            };
+
+            // Apply racial bonuses
+            characterData.abilities = applyRacialBonuses(characterData.abilities, characterData.race);
+
+            // Validate form
+            const validation = validateCharacterForm(characterData);
+            if (!validation.valid) {
+                showAlert('Please fix the following errors:<br>' + validation.errors.join('<br>'), 'danger');
+                return;
+            }
+
+            try {
+                // Create and save character
+                const character = createCharacter(characterData);
+                const id = saveCharacter(character);
+                
+                showAlert(`Character "${character.name}" created successfully!`, 'success');
+                
+                // Redirect to character view or list
+                setTimeout(() => {
+                    window.location.href = 'characters.html';
+                }, 2000);
+                
+            } catch (error) {
+                showAlert('Failed to save character: ' + error.message, 'danger');
+            }
+        }
+    </script>
+</body>
+</html>
