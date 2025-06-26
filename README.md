@@ -1,5 +1,7 @@
 # D&D 5e Character Creator
 
+Made as an experiment to test the capabilities of Cline + Gemini 2.5 Pro. No code was touched by human fingers.
+
 A comprehensive Dungeons & Dragons 5th Edition character creation tool built with Go, featuring both CLI and web interfaces with full spell selection capabilities.
 
 ## 🎲 Features
